@@ -88,12 +88,12 @@ export default function BookDetail() {
 
   const { nextBook } = React.useMemo(() => {
     const items = allBooks?.items || [];
-    if (!book) return { nextBook: null };
+    if (!book || items.length <= 1) return { nextBook: null };
     const idx = items.findIndex((item) => item._id === book._id);
     if (idx === -1) return { nextBook: null };
-    return {
-      nextBook: idx < items.length - 1 ? items[idx + 1] : null,
-    };
+    const nextIdx = (idx + 1) % items.length;
+    if (nextIdx === idx) return { nextBook: null };
+    return { nextBook: items[nextIdx] };
   }, [allBooks, book]);
 
   const handleEdit = (review) => {
@@ -206,7 +206,7 @@ export default function BookDetail() {
         <Link
           to="/books"
           onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-poppins text-white/80 hover:text-white hover:border-white/40"
+          className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-poppins cursor-pointer text-white/80 hover:text-white bg-slate-900 hover:bg-slate-500  hover:border-white/40"
         >
           ← Back to books
         </Link>
@@ -214,7 +214,7 @@ export default function BookDetail() {
           type="button"
           onClick={() => goToBook(nextBook?._id)}
           disabled={!nextBook}
-          className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-poppins text-white/80 hover:text-white hover:border-white/40 disabled:opacity-40 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-sm font-poppins text-white/80 hover:text-white hover:border-white/40 bg-slate-900 hover:bg-slate-500 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {nextBook ? nextBook.title : 'No next'}
           <ChevronRight size={18} />

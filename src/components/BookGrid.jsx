@@ -33,7 +33,7 @@ const BookGrid = () => {
         ) : items.length === 0 ? (
           <div className="text-center py-16 text-white/70">No books found.</div>
         ) : (
-          <div className="grid  mt-10 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" role="list">
+          <div className="grid place-self-center sm:place-self-auto  mt-10 grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" role="list">
             {items.map((book) => (
               <div role="listitem" key={book._id}>
                 <BookCard book={book} />  

@@ -25,7 +25,14 @@ const Footer = () => {
                   Discover your next great read with curated recommendations, personalized shelves, and a vibrant community of book lovers.
                 </p>
               </div>
-
+                          {/* <div className=' bookshelf shelf '>
+                            <div className=' book b1'></div>
+                            <div className=' book b2'></div>
+                            <div className=' book b3'></div>
+                            <div className=' book b4'></div>
+                            <div className=' book b5'></div>
+                            <div className=' book b6'></div>
+                          </div> */}
               <div className="flex items-center gap-4 text-neutral-400">
                 <a
                   href="https://www.facebook.com"
@@ -129,7 +136,7 @@ const Footer = () => {
                 />
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center rounded-full bg-sky-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500"
+                  className="inline-flex cursor-pointer items-center justify-center rounded-full bg-sky-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500"
                 >
                   Subscribe
                 </button>

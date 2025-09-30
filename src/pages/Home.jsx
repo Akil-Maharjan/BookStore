@@ -1,12 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { QrCode, Gift, BarChart3, Database, TrendingUp, Bell } from 'lucide-react';
+import { QrCode, Gift, BarChart3, Database, TrendingUp, Bell, ShoppingBag } from 'lucide-react';
 import BookGrid from '../components/BookGrid.jsx';
 import Features from './Features.jsx';
 import About from './About.jsx';
 import Contact from './Contact.jsx';
 import Background from '../components/Background.jsx';
 import RevealOnScroll from '../components/RevealOnScroll.jsx';
+
 const Home = () => {
   
   return (
@@ -31,9 +32,9 @@ const Home = () => {
                 <p className="mt-6 font-semibold  font-inter text-lg md:text-2xl max-w-5xl mx-auto md:mx-0">
                   Find the best collection of books from classic to contemporary. 
                 </p>
-                <div className="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-4">
-                  <Link to="/books"   className="px-6 py-3.5 rounded-2xl font-inter bg-rose-500  text-lg  font-semibold hover:opacity-90">Shop Now</Link>
-                  <button onClick={() => window.scrollTo({ top: document.getElementById('features')?.offsetTop ?? 0, behavior: 'smooth' })} className="px-6 py-3.5 rounded-2xl font-inter bg-white/90 text-slate-900 text-lg font-semibold hover:bg-white">Explore Features</button>
+                <div className="mt-10  flex flex-wrap items-center justify-center lg:justify-start gap-4">
+                  <Link to="/books"   className="px-6 group  py-3.5 rounded-2xl font-inter bg-rose-500 flex gap-2  text-lg  font-semibold hover:opacity-90">Shop Now <ShoppingBag className="group-hover:scale-[1.1] group-active:animate-ping"  /></Link>
+                  <button onClick={() => window.scrollTo({ top: document.getElementById('features')?.offsetTop ?? 0, behavior: 'smooth' })} className="px-6 py-3.5 cursor-pointer rounded-2xl font-inter bg-white/90 text-slate-900 text-lg font-semibold hover:bg-white">Explore Features</button>
                 </div>
               </RevealOnScroll>
               {/* Image (top on md, right on lg) */}

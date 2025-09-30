@@ -55,6 +55,7 @@ html, body, #root { height: 100%; }
 body {
   margin: 0;
   font-family: Inter, Poppins, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  overflow-x: hidden;
 }
 
 /* Headings use Poppins for a friendlier display look */
@@ -147,3 +148,14 @@ h1, h2, h3, h4, h5, h6 { font-family: Poppins, Inter, system-ui, -apple-system, 
 .scroll-hide::-webkit-scrollbar {
   display: none;
 }
+
+@media (max-width: 900px) {
+  .hide-scroll-sm {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .hide-scroll-sm::-webkit-scrollbar {
+    display: none;
+  }
+}
+/* Slide In from Right Animation: Slides the element in from the right side. Useful for side panels or alerts. */

@@ -15,6 +15,11 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const dismissAfterOneSecond = (toastId) => {
+    if (!toastId) return;
+    setTimeout(() => toast.dismiss(toastId), 1000);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -22,7 +27,8 @@ export default function Login() {
     try {
       const data = await loginApi(email, password);
       setAuth({ user: { _id: data._id, name: data.name, email: data.email, role: data.role }, token: data.token });
-      toast.success('Logged in');
+      const toastId = toast.success('Logged in');
+      dismissAfterOneSecond(toastId);
       navigate('/dashboard', { replace: true });
     } catch (err) {
       const msg = err.response?.data?.message || 'Login failed';

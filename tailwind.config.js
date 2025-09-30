@@ -1,3 +1,5 @@
+
+
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: 'class',
@@ -7,14 +9,14 @@ export default {
   ],
   theme: {
     extend: {
+      
       fontFamily: {
         host: ['"Host Grotesk"', 'sans-serif'],
       },
       colors: {
-        // SmartBook-like palette: amber/gold accent with deep surfaces
         brand: {
-          DEFAULT: '#f5b301', // primary accent (gold/amber)
-          dark: '#d79c00',    // hover/darker state
+          DEFAULT: '#f5b301', 
+          dark: '#d79c00',    
         },
         surface: {
           900: '#0b0f19',

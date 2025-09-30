@@ -1,7 +1,7 @@
 import api from './http';
 
-export const createOrder = async ({ paymentMethod = 'khalti', shipping = 0 }) => {
-  const { data } = await api.post('/orders', { paymentMethod, shipping });
+export const createOrder = async (payload) => {
+  const { data } = await api.post('/orders', payload);
   return data;
 };
 

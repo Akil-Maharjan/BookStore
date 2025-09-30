@@ -12,13 +12,35 @@ export default function Contact() {
 
   const submit = async (e) => {
     e.preventDefault();
-
+      
     const trimmedName = name.trim();
     const trimmedEmail = email.trim();
     const trimmedMessage = message.trim();
 
-    if (!trimmedName || !trimmedEmail || !trimmedMessage) {
-      setError('Please provide your name, email, and message.');
+    if (!trimmedName) {
+      setError('Please provide your name.');
+      return;
+    }
+
+    const alphabetCount = (trimmedName.match(/[A-Za-z]/g) || []).length;
+    if (alphabetCount < 4) {
+      setError('Name must contain more than 3 alphabetic characters.');
+      return;
+    }
+
+    if (!trimmedEmail) {
+      setError('Please provide your email.');
+      return;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(trimmedEmail)) {
+      setError('Please provide a valid email address.');
+      return;
+    }
+
+    if (!trimmedMessage) {
+      setError('Please provide your message.');
       return;
     }
 
@@ -86,7 +108,7 @@ export default function Contact() {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-5 py-2.5 rounded-xl bg-rose-500 text-white font-semibold hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="px-5 cursor-pointer py-2.5 rounded-xl bg-rose-500 text-white font-semibold hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loading ? 'Sending...' : 'Send Message'}
               </button>

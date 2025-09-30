@@ -4,6 +4,7 @@ import { register as registerApi } from '../api/auth.js';
 import { useAuth } from '../store/auth.js';
 import Background from '../components/Background.jsx';
 import { Eye, EyeClosed } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -16,13 +17,46 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const dismissAfterOneSecond = (toastId) => {
+    if (!toastId) return;
+    setTimeout(() => toast.dismiss(toastId), 1000);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+
+    if (!trimmedName) {
+      setError('Please enter your name.');
+      return;
+    }
+
+    const alphabetCount = (trimmedName.match(/[A-Za-z]/g) || []).length;
+    if (alphabetCount < 4) {
+      setError('Name must contain more than 3 alphabetic characters.');
+      return;
+    }
+
+    if (!trimmedEmail) {
+      setError('Please enter your email.');
+      return;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(trimmedEmail)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
     setLoading(true);
     try {
-      const data = await registerApi(name, email, password);
+      const data = await registerApi(trimmedName, trimmedEmail, password);
       setAuth({ user: { _id: data._id, name: data.name, email: data.email, role: data.role }, token: data.token });
+      const toastId = toast.success('Registered successfully');
+      dismissAfterOneSecond(toastId);
       navigate('/dashboard', { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');

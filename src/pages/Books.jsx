@@ -1,20 +1,101 @@
 import React, { useEffect, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchBooks } from '../api/books.js';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import SkeletonBookCard from '../components/SkeletonBookCard.jsx';
 import Background from '../components/Background.jsx';
+import { addToCart } from '../api/cart.js';
+import toast from 'react-hot-toast';
+import { useAnimationControls, motion as Motion } from 'framer-motion';
+import { ShoppingCart } from 'lucide-react';
+import { useAuth } from '../store/auth.js';
 
 const categories = ['All', 'Fiction', 'Non-fiction', 'Fantasy', 'Sci-Fi', 'Biography', 'General'];
 
 export default function Books() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [q, setQ] = useState(searchParams.get('q') || '');
   const [category, setCategory] = useState('All');
   const [sort, setSort] = useState('default');
   const [page, setPage] = useState(1);
+  const qc = useQueryClient();
+  const [clickedCard, setClickedCard] = useState(null);
+  const user = useAuth((s) => s.user);
+  
+  // 👇 new state for tracking which book is being added
+  const [addingBookId, setAddingBookId] = useState(null);
 
-  // keep input synced with URL (?q=)
+  const cartButtonControls = useAnimationControls();
+  const cartIconControls = useAnimationControls();
+
+  const triggerCartSuccess = React.useCallback(() => {
+    cartButtonControls.start({
+      scale: [1, 1.08, 1],
+      boxShadow: [
+        '0 0 0 rgba(0,0,0,0)',
+        '0 0 16px rgba(59,130,246,0.45)',
+        '0 0 0 rgba(0,0,0,0)',
+      ],
+      transition: { duration: 0.6, ease: 'easeOut' },
+    });
+    cartIconControls.start({
+      y: [0, -10, 0],
+      scale: [1, 1.25, 1],
+      transition: { duration: 0.6, ease: 'easeOut' },
+    });
+  }, [cartButtonControls, cartIconControls]);
+
+  const triggerClick = (bookId) => {
+    if (addingBookId) return;
+    handleAddToCart(bookId);
+    setClickedCard(bookId);
+    setTimeout(() => setClickedCard(null), 600);
+  };
+
+  const dismissAfterOneSecond = (toastId) => {
+    if (!toastId) return;
+    setTimeout(() => toast.dismiss(toastId), 1000);
+  };
+
+  const addMut = useMutation({
+    mutationFn: (bookId) => addToCart(bookId, 1),
+    onMutate: (bookId) => {
+      setAddingBookId(bookId);
+      cartButtonControls.start({
+        scale: [1, 0.95, 1],
+        transition: { duration: 0.3, ease: 'easeInOut' },
+      });
+      cartIconControls.start({
+        rotate: [0, -15, 15, 0],
+        transition: { duration: 0.45, ease: 'easeInOut' },
+      });
+    },
+    onSuccess: () => {
+     const toastId = toast.success('Added to cart');
+     dismissAfterOneSecond(toastId);
+      qc.invalidateQueries({ queryKey: ['cart'] });
+      triggerCartSuccess();
+    },
+    
+    onSettled: () => {
+      setAddingBookId(null);
+      dismissAfterOneSecond();
+    },
+  });
+
+  const handleAddToCart = (bookId) => {
+    if (addingBookId) return;
+
+    if (!user) {
+      navigate('/login');
+      scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    addMut.mutate(bookId);
+  };
+
   useEffect(() => {
     const qp = searchParams.get('q') || '';
     setQ(qp);
@@ -36,25 +117,26 @@ export default function Books() {
   const pages = data?.pages || 1;
 
   return (
-    <div className="max-w-[1550px]  mx-auto px-4 py-8">
-      
+    <div className="max-w-[1550px] mx-auto px-4 py-8">
       <div className="flex flex-col sm:flex-row gap-3 sm:items-center mb-4">
-      <Background />
-        <div className="flex-1  relative z-10">
+        <Background />
+        <div className="flex-1 relative z-10">
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search books..."
-            className="w-[30rem] rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:bg-slate-900 dark:border-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:ring-slate-600"
+            className="max-w-[30rem] w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:bg-slate-900 dark:border-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:ring-slate-600"
           />
         </div>
         <div className="relative z-10 flex gap-2">
-         
           <div>
             <select
               className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-800 dark:bg-slate-900 dark:border-slate-700 dark:text-white"
               value={sort}
-              onChange={(e) => { setSort(e.target.value); setPage(1); }}
+              onChange={(e) => {
+                setSort(e.target.value);
+                setPage(1);
+              }}
             >
               <option value="default">Sort by</option>
               <option value="name-asc">Name: A → Z</option>
@@ -72,8 +154,15 @@ export default function Books() {
           {categories.map((c) => (
             <button
               key={c}
-              onClick={() => { setCategory(c); setPage(1); }}
-              className={`px-4 py-2 rounded-full bg-slate-800 cursor-pointer  border text-sm hover:text-black ${category === c ? '  border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white' : 'border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-white'}`}
+              onClick={() => {
+                setCategory(c);
+                setPage(1);
+              }}
+              className={`px-4 py-2 rounded-full bg-slate-800 cursor-pointer border text-sm hover:text-black ${
+                category === c
+                  ? 'border-slate-900 dark:bg-white dark:text-slate-900 dark:border-white'
+                  : 'border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-white'
+              }`}
             >
               {c}
             </button>
@@ -81,56 +170,115 @@ export default function Books() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 relative z-10">
+      <div className="grid place-self-center sm:place-self-auto mb-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 relative z-10">
         {isLoading
-          ? Array.from({ length: 12 }).map((_, idx) => (
-              <SkeletonBookCard key={idx} />
-            ))
+          ? Array.from({ length: 12 }).map((_, idx) => <SkeletonBookCard key={idx} />)
           : items.map((b) => (
               <article
                 key={b._id}
-                className="rounded-xl overflow-hidden border backdrop-blur border-white/10 hover:shadow-lg hover:shadow-black/30 transition "
+                className="rounded-xl max-w-[22rem] flex flex-col justify-center w-full overflow-hidden border-2 backdrop-blur border-white hover:border-white/50 hover:shadow-lg hover:shadow-black/30 transition"
               >
                 <Link
                   to={`/books/${b._id}`}
                   onClick={() => scrollTo({ top: 0, behavior: 'smooth' })}
                   className="block"
                 >
-                  <div className="relative w-full h-60">
-                  <img
-                    className="w-full h-60 object-fit  "
-                    src={b.coverUrl || '/placeholder.svg'}
-                    alt={b.title}
-                  />
+                  <div className="relative w-full h-80">
+                    <img
+                      className="w-full h-full sm:object-fit"
+                      src={b.coverUrl || '/placeholder.svg'}
+                      alt={b.title}
+                    />
                   </div>
                 </Link>
                 <div className="p-3 flex flex-col gap-2">
-                  <h3 className="text-base font-poppins font-semibold line-clamp-1 text-white">{b.title}</h3>
-                  <p className="text-sm font-poppins text-white/70">{b.author}</p>
-                  {(b.price_npr != null) && (
-  <p className="text-brand font-bold mt-1 font-poppins">
-    Rs. {Number(b.price_npr ?? 0).toLocaleString()}
-  </p>
-)}
+                  <h3 className="text-2xl mb-1 font-poppins font-bold line-clamp-1 text-white">
+                    {b.title}
+                  </h3>
+                  <p className="text-md font-poppins mb-1 flex gap-2 font-medium text-white/70">
+                    by
+                    <span className="font-bold text-white">&quot;{b.author}&quot;</span>
+                  </p>
                   {b.category != null && (
-                    <p className="text-xs font-poppins text-white/50 uppercase tracking-wide">{b.category}</p>
+                    <p className="text-xs font-poppins mb-2 text-white/50 uppercase tracking-wide">
+                      {b.category}
+                    </p>
                   )}
-                  <Link
-                    to={`/books/${b._id}`}
-                    onClick={() => scrollTo({ top: 0, behavior: 'smooth' })}
-                    className="mt-2 inline-flex justify-center items-center gap-2 rounded border border-white/20 px-3 py-2 text-sm font-poppins text-white/80 hover:text-white hover:border-white/40 transition"
-                  >
-                    View Details
-                  </Link>
+                  {b.price_npr != null && (
+                    <p className="text-brand text-md font-bold mt-1 mb-5 flex gap-2 font-poppins">
+                      <span className="font-poppins">Rs.</span>{' '}
+                      {Number(b.price_npr ?? 0).toLocaleString()}
+                    </p>
+                  )}
+                  <div className="flex justify-between gap-2">
+                    <div className="flex gap-2">
+                      <Motion.button
+                        type="button"
+                        onClick={() => triggerClick(b._id)}
+                        disabled={addingBookId === b._id}
+                        aria-busy={addingBookId === b._id}
+                        className="group rounded overflow-hidden font-poppins bg-brand hover:bg-brand-dark text-sm flex items-center disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        <Motion.span
+                          className="group flex border bg-slate-900 hover:bg-slate-500 w-[150px] cursor-pointer items-center justify-between border-white/50 rounded px-3 py-2 gap-2"
+                          style={{ transformOrigin: 'center' }}
+                        >
+                          <Motion.span
+                            animate={
+                              clickedCard === b._id
+                                ? { x: 150, rotate: -30 }
+                                : { x: 0, rotate: 0 }
+                            }
+                            transition={{ duration: 0.5, ease: 'easeInOut' }}
+                            className="shrink-0"
+                          >
+                            <ShoppingCart className="w-5 h-5" />
+                          </Motion.span>
+                          <Motion.p
+                            animate={
+                              clickedCard === b._id
+                                ? { opacity: 0 }
+                                : { opacity: 1 }
+                            }
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                            className="flex-1 font-poppins truncate text-center"
+                            title="Add to Cart"
+                          >
+                            {addingBookId === b._id ? 'Adding…' : 'Add to Cart'}
+                          </Motion.p>
+                        </Motion.span>
+                      </Motion.button>
+                    </div>
+                    <Link
+                      to={`/books/${b._id}`}
+                      onClick={() => scrollTo({ top: 0, behavior: 'smooth' })}
+                      className="flex rounded-md cursor-pointer justify-center items-center gap-2 border border-white/20 px-6 py-2 text-sm font-poppins text-white/80 hover:text-white bg-slate-900 hover:bg-slate-500 hover:border-white/40 transition"
+                    >
+                      View Details
+                    </Link>
+                  </div>
                 </div>
               </article>
             ))}
       </div>
 
       {pages > 1 && (
-        <div className="flex  justify-center mt-4 gap-1 relative z-10">
+        <div className="flex justify-center mt-4 gap-1 relative z-10">
           {Array.from({ length: pages }).map((_, i) => (
-            <button key={i} onClick={() => { setPage(i + 1); scrollTo({top: 0, behavior: 'smooth'}) }} className={`px-3 py-1  bg-slate-800 cursor-pointer rounded border ${page === i + 1 ? 'bg-brand text-white border-brand' : 'border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-900'}`}>{i + 1}</button>
+            <button
+              key={i}
+              onClick={() => {
+                setPage(i + 1);
+                scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className={`px-3 py-1 bg-slate-800 cursor-pointer rounded border ${
+                page === i + 1
+                  ? 'bg-brand text-white border-brand'
+                  : 'border-slate-300 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-900'
+              }`}
+            >
+              {i + 1}
+            </button>
           ))}
         </div>
       )}
