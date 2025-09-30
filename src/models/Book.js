@@ -5,7 +5,7 @@ const bookSchema = new mongoose.Schema(
     title: { type: String, required: true, trim: true },
     author: { type: String, required: true, trim: true },
     description: { type: String, default: '' },
-    price: { type: Number, required: true, min: 0 },
+    price_npr: { type: Number, required: true, min: 0 },
     category: { type: String, default: 'General', index: true },
     isbn: { type: String, unique: true, sparse: true, trim: true },
     stock: { type: Number, default: 0 },

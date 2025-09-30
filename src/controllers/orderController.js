@@ -17,10 +17,10 @@ export const createOrderFromCart = async (req, res) => {
   const items = cart.items.map((i) => ({
     book: i.book._id,
     title: i.book.title,
-    price: i.book.price,
+    price_npr: i.book.price_npr,
     quantity: i.quantity,
   }));
-  const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const subtotal = items.reduce((sum, i) => sum + Number(i.price_npr || 0) * i.quantity, 0);
   const total = subtotal + (shipping || 0);
 
   const initialStatus = paymentMethod === 'cod' ? 'shipping' : 'pending';
