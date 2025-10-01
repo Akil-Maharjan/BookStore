@@ -20,6 +20,7 @@ const Contact = lazy(() => import('./pages/Contact.jsx'));
 const AdminBooksList = lazy(() => import('./pages/admin/AdminBooksList.jsx'));
 const AdminBookForm = lazy(() => import('./pages/admin/AdminBookForm.jsx'));
 const AdminOrders = lazy(() => import('./pages/admin/AdminOrders.jsx'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard.jsx'));
 
 const RouteFallback = () => (
   <div className="flex items-center justify-center py-32 text-slate-300">
@@ -47,6 +48,7 @@ export default function AppRoutes() {
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
 
         {/* Admin area but not separate /admin landing; pages guarded and navigated by role */}
+        <Route path="/admin/dashboard" element={<AdminGuard><AdminDashboard /></AdminGuard>} />
         <Route path="/admin/books" element={<AdminGuard><AdminBooksList /></AdminGuard>} />
         <Route path="/admin/books/new" element={<AdminGuard><AdminBookForm mode="create" /></AdminGuard>} />
         <Route path="/admin/books/:id/edit" element={<AdminGuard><AdminBookForm mode="edit" /></AdminGuard>} />
