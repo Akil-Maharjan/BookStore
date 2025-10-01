@@ -12,13 +12,7 @@ import { all } from 'axios';
 const app = express();
 
 app.use(helmet());
-app.use(
-  cors({
-    origin: ['http://localhost:5173', 'https://book-store-eight-pied.vercel.app/'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true,
-  })
-);
+app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
