@@ -23,7 +23,7 @@ export const createOrderFromCart = async (req, res) => {
   const subtotal = items.reduce((sum, i) => sum + Number(i.price_npr || 0) * i.quantity, 0);
   const total = subtotal + (shipping || 0);
 
-  const initialStatus = paymentMethod === 'cod' ? 'shipping' : 'pending';
+  const initialStatus = paymentMethod === 'cod' ? 'processing' : 'pending';
 
   const order = await Order.create({
     user: userId,
@@ -33,13 +33,12 @@ export const createOrderFromCart = async (req, res) => {
     total,
     payment: { method: paymentMethod },
     status: initialStatus,
+    isReviewed: false,
   });
 
-  if (paymentMethod === 'cod') {
-    cart.items = [];
-    cart.updatedAt = new Date();
-    await cart.save();
-  }
+  cart.items = [];
+  cart.updatedAt = new Date();
+  await cart.save();
 
   res.status(201).json(order);
 };
@@ -66,7 +65,7 @@ export const listAllOrders = async (req, res) => {
   res.json(orders);
 };
 
-const allowedStatuses = ['pending', 'shipping', 'paid', 'failed', 'cancelled', 'shipped', 'completed'];
+const allowedStatuses = ['pending', 'processing', 'shipping', 'paid', 'failed', 'cancelled', 'shipped', 'completed'];
 
 export const updateOrderStatus = async (req, res) => {
   const { status } = req.body;
@@ -92,6 +91,10 @@ export const updateOrderStatus = async (req, res) => {
     }
   }
 
+  if (!order.isReviewed && ['shipping', 'shipped', 'completed'].includes(status)) {
+    return res.status(400).json({ message: 'Order must be reviewed before advancing to shipping.' });
+  }
+
   order.status = status;
   if (status === 'completed') {
     order.payment.completedAt = new Date();
@@ -99,7 +102,48 @@ export const updateOrderStatus = async (req, res) => {
   if (status === 'cancelled') {
     order.payment.completedAt = undefined;
   }
+  if (order.payment?.method === 'cod' && ['shipping', 'shipped', 'completed'].includes(status)) {
+    await Cart.updateOne(
+      { user: order.user },
+      { $set: { items: [], updatedAt: new Date() } }
+    );
+  }
   await order.save();
+  res.json(order);
+};
+
+export const setOrderReview = async (req, res) => {
+  const { isReviewed } = req.body;
+  const order = await Order.findById(req.params.id);
+  if (!order) {
+    return res.status(404).json({ message: 'Order not found' });
+  }
+
+  order.isReviewed = Boolean(isReviewed);
+
+  const wasStatus = order.status;
+
+  if (order.isReviewed && ['pending', 'processing'].includes(order.status)) {
+    order.status = 'shipping';
+  }
+
+  if (!order.isReviewed && order.status === 'shipping') {
+    order.status = order.payment?.method === 'cod' ? 'processing' : 'pending';
+  }
+
+  await order.save();
+
+  if (
+    order.isReviewed &&
+    ['shipping', 'shipped', 'completed'].includes(order.status) &&
+    order.payment?.method === 'cod'
+  ) {
+    await Cart.updateOne(
+      { user: order.user },
+      { $set: { items: [], updatedAt: new Date() } }
+    );
+  }
+
   res.json(order);
 };
 

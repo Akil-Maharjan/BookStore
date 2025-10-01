@@ -11,12 +11,20 @@ export const listBooks = async (req, res) => {
   const maxPrice = req.query.maxPrice ? Number(req.query.maxPrice) : undefined;
 
   const filter = {};
-  if (q) filter.$text = { $search: q };
+  if (q) {
+    const regex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    filter.$or = [
+      { title: regex },
+      { author: regex },
+      { category: regex },
+      { description: regex },
+    ];
+  }
   if (category) filter.category = category;
   if (minPrice != null || maxPrice != null) {
-    filter.price = {};
-    if (minPrice != null) filter.price.$gte = minPrice;
-    if (maxPrice != null) filter.price.$lte = maxPrice;
+    filter.price_npr = {};
+    if (minPrice != null) filter.price_npr.$gte = minPrice;
+    if (maxPrice != null) filter.price_npr.$lte = maxPrice;
   }
 
   let sort = { createdAt: -1 };
@@ -28,10 +36,10 @@ export const listBooks = async (req, res) => {
       sort = { title: -1 };
       break;
     case 'price-asc':
-      sort = { price_npr: 1, price: 1 };
+      sort = { price_npr: 1 };
       break;
     case 'price-desc':
-      sort = { price_npr: -1, price: -1 };
+      sort = { price_npr: -1 };
       break;
     default:
       break;
@@ -53,8 +61,8 @@ export const getBook = async (req, res) => {
 };
 
 export const createBook = async (req, res) => {
-  const { title, author, description, price, category, isbn, stock } = req.body;
-  if (!title || !author || price == null) {
+  const { title, author, description, price_npr, category, isbn, stock } = req.body;
+  if (!title || !author || price_npr == null) {
     return res.status(400).json({ message: 'title, author and price are required' });
   }
 
@@ -62,7 +70,7 @@ export const createBook = async (req, res) => {
     title,
     author,
     description,
-    price,
+    price_npr,
     category,
     isbn,
     stock,
@@ -88,7 +96,7 @@ export const updateBook = async (req, res) => {
   const book = await Book.findById(req.params.id);
   if (!book) return res.status(404).json({ message: 'Book not found' });
 
-  const updatable = ['title', 'author', 'description', 'price', 'category', 'isbn', 'stock'];
+  const updatable = ['title', 'author', 'description', 'price_npr', 'category', 'isbn', 'stock'];
   for (const key of updatable) {
     if (req.body[key] !== undefined) book[key] = req.body[key];
   }

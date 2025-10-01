@@ -27,7 +27,7 @@ export const bookValidators = {
   create: validate([
     body('title').isString().isLength({ min: 1 }),
     body('author').isString().isLength({ min: 1 }),
-    body('price').isFloat({ min: 0 }),
+    body('price_npr').isFloat({ min: 0 }),
     body('description').optional().isString(),
     body('category').optional().isString(),
     body('isbn').optional().isString(),
@@ -36,7 +36,7 @@ export const bookValidators = {
   update: validate([
     body('title').optional().isString().isLength({ min: 1 }),
     body('author').optional().isString().isLength({ min: 1 }),
-    body('price').optional().isFloat({ min: 0 }),
+    body('price_npr').optional().isFloat({ min: 0 }),
     body('description').optional().isString(),
     body('category').optional().isString(),
     body('isbn').optional().isString(),
@@ -69,7 +69,6 @@ export const reviewValidators = {
     param('bookId').isMongoId(),
   ]),
   remove: validate([
-    param('bookId').isMongoId(),
     body('reviewId').optional().isMongoId(),
   ]),
 };
@@ -81,7 +80,11 @@ export const orderValidators = {
   ]),
   updateStatus: validate([
     param('id').isMongoId(),
-    body('status').isIn(['pending', 'shipping', 'paid', 'failed', 'cancelled', 'shipped', 'completed']),
+    body('status').isIn(['pending', 'processing', 'shipping', 'paid', 'failed', 'cancelled', 'shipped', 'completed']),
+  ]),
+  review: validate([
+    param('id').isMongoId(),
+    body('isReviewed').isBoolean(),
   ]),
   byId: validate([
     param('id').isMongoId(),
@@ -100,9 +103,10 @@ export const paymentValidators = {
   ]),
 };
 
+
+
 export const contactValidators = {
   submit: validate([
-    body('name').isString().trim().isLength({ min: 1 }).withMessage('Name is required'),
     body('email').isEmail().withMessage('Valid email is required'),
     body('message').isString().trim().isLength({ min: 1 }).withMessage('Message is required'),
   ]),

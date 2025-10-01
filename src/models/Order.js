@@ -19,9 +19,10 @@ const orderSchema = new mongoose.Schema(
     total: { type: Number, required: true, min: 0 },
     status: {
       type: String,
-      enum: ['pending', 'shipping', 'paid', 'failed', 'cancelled', 'shipped', 'completed'],
+      enum: ['pending', 'processing', 'shipping', 'paid', 'failed', 'cancelled', 'shipped', 'completed'],
       default: 'pending',
     },
+    isReviewed: { type: Boolean, default: false },
     payment: {
       method: { type: String, enum: ['khalti', 'esewa', 'cod'], default: 'khalti' },
       transactionId: { type: String },

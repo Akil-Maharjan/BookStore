@@ -17,7 +17,8 @@ export const verifyKhalti = async (req, res) => {
       { headers: { Authorization: `Key ${process.env.KHALTI_SECRET_KEY}` } }
     );
 
-    order.status = 'shipping';
+    const shouldAdvanceToShipping = order.isReviewed;
+    order.status = shouldAdvanceToShipping ? 'shipping' : 'processing';
     order.payment.transactionId = resp.data.idx || resp.data.token || token;
     order.payment.verifiedAt = new Date();
     order.payment.raw = resp.data;
@@ -59,7 +60,8 @@ export const verifyEsewa = async (req, res) => {
     const ok = typeof resp.data === 'string' && resp.data.includes('Success');
     if (!ok) throw new Error('Verification not successful');
 
-    order.status = 'shipping';
+    const shouldAdvanceToShipping = order.isReviewed;
+    order.status = shouldAdvanceToShipping ? 'shipping' : 'processing';
     order.payment.transactionId = refId;
     order.payment.verifiedAt = new Date();
     order.payment.raw = { response: resp.data };
