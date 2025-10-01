@@ -12,7 +12,15 @@ import { all } from 'axios';
 const app = express();
 
 app.use(helmet());
-app.use(cors());
+app.use((req, res, next) => {
+  // ✅ Allow cross-origin frontend
+  res.setHeader("Access-Control-Allow-Origin", "https://book-store-eight-pied.vercel.app");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  
+  next();
+});
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
