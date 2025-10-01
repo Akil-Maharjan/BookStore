@@ -12,8 +12,8 @@ const app = express();
 
 // ✅ CORS middleware
 app.use(cors({
-  origin: 'https://book-store-eight-pied.vercel.app', // your frontend
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  origin: ['http://localhost:5173', 'https://book-store-eight-pied.vercel.app'], // your frontend
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
