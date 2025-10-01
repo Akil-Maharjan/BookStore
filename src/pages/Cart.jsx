@@ -9,11 +9,12 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import toast from 'react-hot-toast';
 import { confirmToast } from '../utils/confirmToast.jsx';
 import Background from '../components/Background.jsx';
+import CartSkeleton from '../components/skeletons/CartSkeleton.jsx';
 
 export default function Cart() {
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const { data: cart } = useQuery({ queryKey: ['cart'], queryFn: getCart });
+  const { data: cart, isLoading } = useQuery({ queryKey: ['cart'], queryFn: getCart });
 
   const dismissAfterOneSecond = (toastId) => {
     if (!toastId) return;
@@ -87,6 +88,9 @@ export default function Cart() {
       }}
     >
       <Background />
+      {isLoading ? (
+        <CartSkeleton />
+      ) : (
       <Box sx={{ position: 'relative', zIndex: 1 }}>
         <Typography
           variant="h4"
@@ -415,6 +419,7 @@ export default function Cart() {
           </Box>
         )}
       </Box>
+      )}
     </Container>
   );
 }

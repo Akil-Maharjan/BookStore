@@ -17,6 +17,7 @@ import {
   Toolbar,
   TextField,
   TablePagination,
+  Avatar,
 } from '@mui/material';
 import dayjs from 'dayjs';
 import toast from 'react-hot-toast';
@@ -38,6 +39,7 @@ const formatCurrency = (value) => `Rs. ${Number(value || 0).toLocaleString()}`;
 const statusChipStyles = (status) => {
   switch (status) {
     case 'pending':
+    case 'processing':
     case 'shipping':
       return {
         color: '#ffffff',
@@ -69,6 +71,7 @@ const statusChipStyles = (status) => {
 
 const statusColor = (status) => {
   switch (status) {
+    case 'processing':
     case 'shipping':
       return 'info';
     case 'completed':
@@ -86,7 +89,8 @@ const statusColor = (status) => {
 
 const statusDescription = {
   pending: 'Awaiting payment confirmation.',
-  shipping: 'Payment confirmed. Your order is being prepared/shipped.',
+  processing: 'Order received. We are preparing the package.',
+  shipping: 'Payment confirmed. Your order is being shipped.',
   shipped: 'Order shipped. Delivery on the way.',
   completed: 'Order completed. Thank you!',
   failed: 'Payment failed. Please retry.',
@@ -143,24 +147,11 @@ export default function Orders() {
 
   const renderOrderActions = (order) => {
     const canComplete = ['shipping', 'shipped'].includes(order.status);
-    const canCancel = ['pending', 'shipping'].includes(order.status);
-    const canDelete = ['pending', 'shipping', 'cancelled', 'failed', 'completed'].includes(order.status);
+    const canCancel = ['pending', 'processing', 'paid'].includes(order.status);
+    const canDelete = ['cancelled', 'failed', 'completed'].includes(order.status);
 
     const actions = [];
 
-    if (canComplete) {
-      actions.push(
-        <Button
-          key="complete"
-          variant="contained"
-          size="small"
-          disabled={statusMut.isPending}
-          onClick={() => statusMut.mutate({ id: order._id, status: 'completed' })}
-        >
-          Mark as Received
-        </Button>
-      );
-    }
     if (canCancel) {
       actions.push(
         <Button
@@ -180,6 +171,21 @@ export default function Orders() {
         </Button>
       );
     }
+
+    if (canComplete) {
+      actions.push(
+        <Button
+          key="complete"
+          variant="contained"
+          size="small"
+          disabled={statusMut.isPending}
+          onClick={() => statusMut.mutate({ id: order._id, status: 'completed' })}
+        >
+          Mark as Received
+        </Button>
+      );
+    }
+
     if (canDelete) {
       actions.push(
         <Tooltip key="delete" title="Remove this order from your history">
@@ -191,9 +197,9 @@ export default function Orders() {
               disabled={deleteMut.isPending}
               onClick={async () => {
                 const ok = await confirmToast({ message: 'Remove this order from history?', confirmText: 'Remove' });
-                if (ok) {deleteMut.mutate(order._id)
-                  
-                };
+                if (ok) {
+                  deleteMut.mutate(order._id);
+                }
               }}
             >
               Delete Order
@@ -431,13 +437,32 @@ export default function Orders() {
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <Typography variant="body2" fontWeight={500} sx={{ color: palette.primaryText }}>
-                            {totalItems} item{totalItems === 1 ? '' : 's'}
-                          </Typography>
-                          <Typography variant="body2" sx={{ color: palette.secondaryText }}>
-                            {order.items?.[0]?.book?.title || order.items?.[0]?.title || '—'}
-                            {totalItems > 1 ? ` +${totalItems - 1}` : ''}
-                          </Typography>
+                          <Stack direction="row" spacing={2} alignItems="center">
+                            <Avatar
+                              variant="rounded"
+                              src={order.items?.[0]?.book?.coverUrl}
+                              alt={order.items?.[0]?.book?.title || order.items?.[0]?.title}
+                              sx={{
+                                width: 56,
+                                height: 80,
+                                borderRadius: 1.5,
+                                bgcolor: 'rgba(15,23,42,0.4)',
+                                border: '1px solid rgba(255,255,255,0.12)',
+                                fontSize: 24,
+                              }}
+                            >
+                              {order.items?.[0]?.book?.title?.[0]?.toUpperCase() || order.items?.[0]?.title?.[0]?.toUpperCase() || '📘'}
+                            </Avatar>
+                            <Box>
+                              <Typography variant="body2" sx={{ color: 'white' }} noWrap title={order.items?.[0]?.book?.title || order.items?.[0]?.title}>
+                                {order.items?.[0]?.book?.title || order.items?.[0]?.title || '—'}
+                                {totalItems > 1 ? ` +${totalItems - 1}` : ''}
+                              </Typography>
+                              <Typography variant="body2" fontWeight={500} sx={{ color: palette.secondaryText }}>
+                                {totalItems} item{totalItems === 1 ? '' : 's'}
+                              </Typography>
+                            </Box>
+                          </Stack>
                         </TableCell>
                         <TableCell>
                           <Typography variant="subtitle1" fontWeight={600} sx={{ color: palette.primaryText }}>

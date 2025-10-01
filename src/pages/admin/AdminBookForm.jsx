@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Container, Typography, Grid, Button, Box, Stack, TextField } from '@mui/material';
+import { Container, Typography, Grid, Button, Box, Stack, TextField, CircularProgress } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchBook, createBook, updateBook } from '../../api/books.js';
 import toast from 'react-hot-toast';
 import { confirmToast } from '../../utils/confirmToast.jsx';
 import Background from '../../components/Background.jsx';
+import AdminFormSkeleton from '../../components/skeletons/AdminFormSkeleton.jsx';
 
 const FormShell = styled(Box)(() => ({
   position: 'relative',
@@ -47,14 +48,15 @@ export default function AdminBookForm({ mode = 'create' }) {
   const params = useParams();
   const isEdit = mode === 'edit';
   const id = params.id;
+  const qc = useQueryClient();
 
-  const { data: book } = useQuery({
+  const { data: book, isLoading: isBookLoading } = useQuery({
     queryKey: ['book', id],
     queryFn: () => fetchBook(id),
     enabled: isEdit && !!id,
   });
 
-  const [form, setForm] = useState({ title: '', author: '', description: '', price: '', category: '', isbn: '', stock: '' });
+  const [form, setForm] = useState({ title: '', author: '', description: '', price_npr: '', category: '', isbn: '', stock: '' });
   const [cover, setCover] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
 
@@ -64,7 +66,7 @@ export default function AdminBookForm({ mode = 'create' }) {
         title: book.title || '',
         author: book.author || '',
         description: book.description || '',
-        price: book.price || '',
+        price_npr: book.price_npr || '',
         category: book.category || '',
         isbn: book.isbn || '',
         stock: book.stock || '',
@@ -83,12 +85,9 @@ export default function AdminBookForm({ mode = 'create' }) {
       if (isEdit) return updateBook(id, payload);
       return createBook(payload);
     },
-    onSuccess: () => {
-      toast.success(isEdit ? 'Book updated' : 'Book added');
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ['books'] });
       navigate('/admin/books', { replace: true });
-    },
-    onError: (err) => {
-      toast.error(err?.response?.data?.message || 'Action failed');
     },
   });
 
@@ -112,10 +111,13 @@ export default function AdminBookForm({ mode = 'create' }) {
             Back
           </Button>
         </Stack>
+        {isBookLoading ? (
+          <AdminFormSkeleton />
+        ) : (
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}><StyledTextField name="title" label="Title" value={form.title} onChange={onChange} fullWidth required /></Grid>
           <Grid item xs={12} sm={6}><StyledTextField name="author" label="Author" value={form.author} onChange={onChange} fullWidth required /></Grid>
-          <Grid item xs={12} sm={6}><StyledTextField name="price" label="Price" type="number" value={form.price} onChange={onChange} fullWidth required /></Grid>
+          <Grid item xs={12} sm={6}><StyledTextField name="price_npr" label="Price" type="number" value={form.price_npr} onChange={onChange} fullWidth required /></Grid>
           <Grid item xs={12} sm={6}><StyledTextField name="stock" label="Stock" type="number" value={form.stock} onChange={onChange} fullWidth /></Grid>
           <Grid item xs={12} sm={6}><StyledTextField name="category" label="Category" value={form.category} onChange={onChange} fullWidth /></Grid>
           <Grid item xs={12} sm={6}><StyledTextField name="isbn" label="ISBN" value={form.isbn} onChange={onChange} fullWidth /></Grid>
@@ -184,11 +186,17 @@ export default function AdminBookForm({ mode = 'create' }) {
                 onClick={async () => {
                   const action = isEdit ? 'Save changes to this book?' : 'Add this book?';
                   const ok = await confirmToast({ message: action, confirmText: isEdit ? 'Save' : 'Add' });
-                  if (ok) mut.mutate();
+                  if (ok) {
+                    await toast.promise(mut.mutateAsync(), {
+                      loading: isEdit ? 'Saving changes…' : 'Creating book…',
+                      success: isEdit ? 'Book updated' : 'Book added',
+                      error: (err) => err?.response?.data?.message || 'Action failed',
+                    });
+                  }
                 }}
                 disabled={mut.isLoading}
               >
-                {mut.isLoading ? 'Saving…' : isEdit ? 'Save Changes' : 'Create Book'}
+                {mut.isLoading ? <CircularProgress size={24} color="inherit" /> : isEdit ? 'Save Changes' : 'Create Book'}
               </Button>
               <Button
                 variant="outlined"
@@ -201,6 +209,7 @@ export default function AdminBookForm({ mode = 'create' }) {
             </Stack>
           </Grid>
         </Grid>
+        )}
       </FormShell>
     </Container>
   );

@@ -29,3 +29,8 @@ export const deleteOrder = async (id) => {
   const { data } = await api.delete(`/orders/${id}`);
   return data;
 };
+
+export const setOrderReview = async (id, isReviewed) => {
+  const { data } = await api.patch(`/orders/${id}/review`, { isReviewed });
+  return data;
+};

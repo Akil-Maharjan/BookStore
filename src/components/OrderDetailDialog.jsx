@@ -11,6 +11,7 @@ import {
   Divider,
   Chip,
   Grid,
+  Avatar,
 } from '@mui/material';
 import dayjs from 'dayjs';
 
@@ -23,6 +24,7 @@ const defaultStatusColor = (status) => {
     case 'shipped':
       return 'success';
     case 'shipping':
+    case 'processing':
       return 'info';
     case 'pending':
       return 'warning';
@@ -175,19 +177,36 @@ export default function OrderDetailDialog({
                     }}
                   >
                     <Stack direction="row" justifyContent="space-between" gap={2} flexWrap="wrap">
-                      <Box>
-                        <Typography variant="body1" fontWeight={600}>
-                          {item.book?.title || item.title}
-                        </Typography>
-                        {item.book?.author && (
-                          <Typography variant="body2" sx={{ opacity: 0.75 }}>
-                            {item.book.author}
+                      <Stack direction="row" spacing={2} alignItems="flex-start" sx={{ minWidth: 0 }}>
+                        <Avatar
+                          variant="rounded"
+                          src={item.book?.coverUrl}
+                          alt={item.book?.title || item.title}
+                          sx={{
+                            width: 64,
+                            height: 96,
+                            borderRadius: 1.5,
+                            bgcolor: 'rgba(15,23,42,0.4)',
+                            border: '1px solid rgba(255,255,255,0.15)',
+                            fontSize: 28,
+                          }}
+                        >
+                          {item.book?.title?.[0]?.toUpperCase() || item.title?.[0]?.toUpperCase() || '📘'}
+                        </Avatar>
+                        <Box sx={{ minWidth: 0 }}>
+                          <Typography variant="body1" fontWeight={600} noWrap title={item.book?.title || item.title}>
+                            {item.book?.title || item.title}
                           </Typography>
-                        )}
-                        <Typography variant="body2" sx={{ opacity: 0.75 }}>
-                          Qty: {quantity}
-                        </Typography>
-                      </Box>
+                          {item.book?.author && (
+                            <Typography variant="body2" sx={{ opacity: 0.75 }} noWrap title={item.book.author}>
+                              {item.book.author}
+                            </Typography>
+                          )}
+                          <Typography variant="body2" sx={{ opacity: 0.75 }}>
+                            Qty: {quantity}
+                          </Typography>
+                        </Box>
+                      </Stack>
                       <Stack textAlign={{ xs: 'left', sm: 'right' }}>
                         <Typography variant="body2" sx={{ opacity: 0.75 }}>
                           Unit: {formatCurrency(unitPrice)}

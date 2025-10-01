@@ -1,5 +1,6 @@
 import React from 'react';
-
+import logo from "../assets/logo.png";
+import { Link } from 'react-router-dom';
 const Footer = () => {
   const handleSubscribe = (event) => {
     event.preventDefault();
@@ -18,9 +19,16 @@ const Footer = () => {
 
         <div className="relative  z-10 mx-auto max-w-screen-2xl px-6 py-10 lg:px-12">
           <div className="grid gap-12 lg:grid-cols-[1.6fr_repeat(3,minmax(0,1fr))]">
-            <div className="space-y-6">
+            
+            <div className="space-y-4 ">
+            
               <div>
-                <h2 className="text-2xl font-semibold text-white">BookStore</h2>
+                    <Link to="/"
+                    className="inline-flex"
+                    aria-label="Home"
+                    onClick={()=> scrollTo({top:0, behavior:"smooth"})}>
+                  <img src={logo} alt="" className="w-35 h-35"/>
+                  </Link>
                 <p className="mt-3 max-w-md text-sm text-neutral-400">
                   Discover your next great read with curated recommendations, personalized shelves, and a vibrant community of book lovers.
                 </p>
@@ -83,8 +91,8 @@ const Footer = () => {
             </div>
 
             <nav aria-label="Explore" className="space-y-4 text-sm">
-              <h3 className="font-semibold uppercase tracking-wide text-neutral-200">Explore</h3>
-              <ul className="space-y-3 text-neutral-400">
+              <h3 className="font-semibold  uppercase tracking-wide text-neutral-200">Explore</h3>
+              <ul className="space-y-3  text-neutral-400">
                 <li>
                   <a className="transition hover:text-white" href="#popular">Popular Titles</a>
                 </li>

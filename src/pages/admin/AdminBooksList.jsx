@@ -2,13 +2,14 @@ import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchBooks, deleteBook } from '../../api/books.js';
 import { Link } from 'react-router-dom';
-import { Container, Box, Typography, Button, Table, TableHead, TableRow, TableCell, TableBody, IconButton, TableContainer, Chip } from '@mui/material';
+import { Container, Box, Typography, Button, Table, TableHead, TableRow, TableCell, TableBody, IconButton, TableContainer, Chip, Stack } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import toast from 'react-hot-toast';
 import { confirmToast } from '../../utils/confirmToast.jsx';
 import Background from '../../components/Background.jsx';
+import AdminTableSkeleton from '../../components/skeletons/AdminTableSkeleton.jsx';
 
 const HeadCell = styled(TableCell)(({ theme }) => ({
   textTransform: 'uppercase',
@@ -30,17 +31,35 @@ const BodyCell = styled(TableCell)(({ theme }) => ({
 
 export default function AdminBooksList() {
   const qc = useQueryClient();
-  const { data } = useQuery({ queryKey: ['books', { admin: true }], queryFn: () => fetchBooks({ limit: 100 }) });
+  const { data, isLoading } = useQuery({ queryKey: ['books', { admin: true }], queryFn: () => fetchBooks({ limit: 100 }) });
   const items = data?.items || [];
 
   const delMut = useMutation({
-    mutationFn: (id) => deleteBook(id),
-    onSuccess: () => {
-      toast.success('Book deleted');
-      qc.invalidateQueries({ queryKey: ['books'] });
+    mutationFn: async (id) => {
+      const promise = deleteBook(id);
+      await toast.promise(promise, {
+        loading: 'Deleting book…',
+        success: 'Book deleted',
+        error: (err) => err?.response?.data?.message || 'Delete failed',
+      });
+      return promise;
     },
-    onError: (err) => {
-      toast.error(err?.response?.data?.message || 'Delete failed');
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: ['books'] });
+      const prev = qc.getQueryData(['books', { admin: true }]);
+      if (prev?.items) {
+        qc.setQueryData(['books', { admin: true }], {
+          ...prev,
+          items: prev.items.filter((b) => b._id !== id),
+        });
+      }
+      return { prev };
+    },
+    onError: (err, _id, context) => {
+      if (context?.prev) qc.setQueryData(['books', { admin: true }], context.prev);
+    },
+    onSettled: () => {
+      qc.invalidateQueries({ queryKey: ['books'] });
     },
   });
 
@@ -74,46 +93,65 @@ export default function AdminBooksList() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {items.map((b) => (
-              <TableRow
-                key={b._id}
-                hover
-                sx={{
-                  transition: 'transform 0.2s ease, background 0.2s ease',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    background: 'rgba(148, 163, 184, 0.08)',
-                  },
-                }}
-              >
-                <BodyCell sx={{ fontWeight: 600 }}>{b.title}</BodyCell>
-                <BodyCell>{b.author}</BodyCell>
-                <BodyCell align="right">Rs. {b.price ?? '—'}</BodyCell>
-                <BodyCell align="center">
-                  <Chip
-                    size="small"
-                    label={typeof b.stock === 'number' ? `${b.stock} in stock` : '—'}
-                    color={b.stock > 5 ? 'success' : b.stock > 0 ? 'warning' : 'error'}
-                    variant="outlined"
-                  />
-                </BodyCell>
-                <BodyCell align="right">
-                  <IconButton component={Link} to={`/admin/books/${b._id}/edit`} color="primary" size="small">
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={async () => {
-                      const ok = await confirmToast({ message: `Delete book "${b.title}"? This action cannot be undone.`, confirmText: 'Delete' });
-                      if (ok) delMut.mutate(b._id);
-                    }}
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </BodyCell>
+            {isLoading ? (
+              <AdminTableSkeleton rows={8} />
+            ) : items.length ? (
+              items.map((b) => (
+                <TableRow
+                  key={b._id}
+                  hover
+                  sx={{
+                    transition: 'transform 0.2s ease, background 0.2s ease',
+                    opacity: delMut.isPending ? 0.6 : 1,
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      background: 'rgba(148, 163, 184, 0.08)',
+                    },
+                  }}
+                >
+                  <BodyCell sx={{ fontWeight: 600 }}>{b.title}</BodyCell>
+                  <BodyCell>{b.author}</BodyCell>
+                  <BodyCell align="right">Rs. {b.price_npr ?? '—'}</BodyCell>
+                  <BodyCell align="center">
+                    <Chip
+                      size="small"
+                      label={typeof b.stock === 'number' ? `${b.stock} in stock` : '—'}
+                      color={b.stock > 5 ? 'success' : b.stock > 0 ? 'warning' : 'error'}
+                      variant="outlined"
+                    />
+                  </BodyCell>
+                  <BodyCell align="right">
+                    <IconButton component={Link} to={`/admin/books/${b._id}/edit`} color="primary" size="small">
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      disabled={delMut.isPending}
+                      onClick={async () => {
+                        const ok = await confirmToast({ message: `Delete book "${b.title}"? This action cannot be undone.`, confirmText: 'Delete' });
+                        if (ok) delMut.mutate(b._id);
+                      }}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </BodyCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5}>
+                  <Stack alignItems="center" py={8} spacing={1}>
+                    <Typography variant="body1" color="white">
+                      No books found.
+                    </Typography>
+                    <Typography variant="body2" color="rgba(255,255,255,0.6)">
+                      Add a book to get started.
+                    </Typography>
+                  </Stack>
+                </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </TableContainer>

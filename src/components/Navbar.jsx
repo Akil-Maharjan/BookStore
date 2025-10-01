@@ -10,6 +10,7 @@ import {
   BookOpen,
   Mail,
 } from "lucide-react";
+import logo from "../assets/logo.png";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -132,9 +133,9 @@ const Navbar = () => {
     `${active === key ? "text-black" : "text-slate-600 dark:text-white"} group-hover:text-black`;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 text-slate-800 backdrop-blur bg-white/80 dark:bg-slate-900/80 dark:border-slate-700 dark:text-slate-100">
+    <header className="sticky top-0 z-50 shadow-[0_8px_20px_-8px_rgba(15,23,42,0.55),0_2px_6px_rgba(15,23,42,0.18)] border-b border-white/40 dark:border-slate-800 text-slate-800 backdrop-blur bg-white/85 dark:bg-slate-900/25 dark:text-slate-100">
       <nav className="max-w-[96rem] mx-auto px-4">
-        <div className="flex items-center justify-between h-14">
+        <div className="flex items-center justify-between h-20 ">
           {/* Left: Brand */}
           <Link
             to="/"
@@ -151,7 +152,7 @@ const Navbar = () => {
               }
             }}
           >
-            📚 BookStore
+            <img src={logo} alt="" className="w-25 h-25"/>
           </Link>
 
           {/* Center nav links (desktop & md) */}
@@ -262,7 +263,10 @@ const Navbar = () => {
                       Dashboard
                     </Link>
                     <button
-                      onClick={doLogout}
+                      onClick={() => {
+                        doLogout();
+                        scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
                       className="block w-full text-left px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-slate-800"
                     >
                       Logout
@@ -390,7 +394,10 @@ const Navbar = () => {
               </Link>
             ) : (
               <button
-                onClick={doLogout}
+                onClick={() => {
+                  doLogout();
+                  scrollTo({ top: 0, behavior: 'smooth' });
+                }}
                 className="px-3 py-2 rounded border border-slate-200 dark:border-slate-600 hover:bg-white hover:text-black dark:hover:bg-white w-fit"
               >
                 Logout
@@ -404,3 +411,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+

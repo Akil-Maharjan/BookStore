@@ -184,6 +184,7 @@ export default function Checkout() {
       };
 
       const order = await createOrderMut.mutateAsync(orderPayload);
+      invalidateOrderQueries();
 
       if (paymentMethod === 'esewa') {
         submitEsewaPayment(order);
@@ -197,7 +198,6 @@ export default function Checkout() {
 
       // COD or other future offline methods
       toast.success('Order placed successfully');
-      invalidateOrderQueries();
       navigate('/orders', { replace: true });
     } catch (err) {
       toast.error(err?.response?.data?.message || 'Failed to initiate checkout');
