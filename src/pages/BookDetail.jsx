@@ -186,6 +186,12 @@ export default function BookDetail() {
   };
 
   const handleSubmitReview = () => {
+    if(!user){
+      toast.error('Please login to submit a review');
+      navigate('/login');
+      scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     if (isSubmitDisabled) return;
     reviewMut.mutate({ rating, comment: comment.trim(), reviewId: isEditing ? editingReviewId : undefined });
   };
@@ -306,7 +312,7 @@ export default function BookDetail() {
   ))}
 </div>
 
-      {user && (
+      
         <div className="rounded border border-white/10 bg-slate-900 p-3 mt-4 relative z-10">
           <h3 className="font-semibold font-poppins mb-2">Write a review</h3>
           <div className="flex flex-col gap-2  sm:items-start">
@@ -371,7 +377,7 @@ export default function BookDetail() {
           </div>
          
         </div>
-      )}
+   
     </div>
   );
 }

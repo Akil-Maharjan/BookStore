@@ -19,7 +19,7 @@ const BookCard = ({ book }) => {
   const addMut = useMutation({
     mutationFn: () => addToCart(_id, 1),
     onSuccess: () => {
-      toast.success('Added to cart', { duration: 1000 });
+      toast.success('Added to cart', { duration: 2000 });
       qc.invalidateQueries({ queryKey: ['cart'] });
     },
     onError: (err) => toast.error(err?.response?.data?.message || 'Failed to add to cart'),

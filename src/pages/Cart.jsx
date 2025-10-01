@@ -18,7 +18,7 @@ export default function Cart() {
 
   const dismissAfterOneSecond = (toastId) => {
     if (!toastId) return;
-    setTimeout(() => toast.dismiss(toastId), 1000);
+    setTimeout(() => toast.dismiss(toastId), 2000);
   };
 
   const updateMut = useMutation({
@@ -246,7 +246,7 @@ export default function Cart() {
                       const ok = await confirmToast({
                         message: `Remove "${i.book.title}" from cart?`,
                         confirmText: 'Remove',
-                        duration: 1000,
+                        duration: 2000,
                       });
                       if (ok) removeMut.mutate(i.book._id);
                     }}

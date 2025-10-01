@@ -7,9 +7,9 @@ import React from 'react';
  */
 export function confirmToast({
   message = 'Are you sure?',
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
-}) {
+  confirmText = 'Yes',
+  cancelText = 'No',
+} = {}) {
   return new Promise((resolve) => {
     const finalize = (result) => {
       toast.dismiss(id);

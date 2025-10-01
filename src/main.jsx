@@ -16,7 +16,7 @@ createRoot(document.getElementById('root')).render(
           <Toaster
             position="top-right"
             toastOptions={{
-              duration: 1000,
+              duration: 2000,
             }}
             gutter={12}
           />

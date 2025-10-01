@@ -26,7 +26,7 @@ import { getMyOrders, updateOrderStatus, deleteOrder } from '../api/orders.js';
 import { confirmToast } from '../utils/confirmToast.jsx';
 import OrderDetailDialog from '../components/OrderDetailDialog.jsx';
 
-const TOAST_DURATION = 1000;
+const TOAST_DURATION = 2000;
 
 const palette = {
   primaryText: 'rgba(226,232,255,0.92)',
@@ -161,7 +161,7 @@ export default function Orders() {
           color="warning"
           disabled={statusMut.isPending}
           onClick={async () => {
-            const ok = await confirmToast({ message: 'Cancel this order?', confirmText: 'Cancel' });
+            const ok = await confirmToast({ message: 'Cancel this order?' });
             if (ok) {
               statusMut.mutate({ id: order._id, status: 'cancelled' });
             }
@@ -196,7 +196,7 @@ export default function Orders() {
               color="error"
               disabled={deleteMut.isPending}
               onClick={async () => {
-                const ok = await confirmToast({ message: 'Remove this order from history?', confirmText: 'Remove' });
+                const ok = await confirmToast({ message: 'Remove this order from history?' });
                 if (ok) {
                   deleteMut.mutate(order._id);
                 }

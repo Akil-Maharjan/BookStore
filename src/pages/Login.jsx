@@ -17,7 +17,7 @@ export default function Login() {
 
   const dismissAfterOneSecond = (toastId) => {
     if (!toastId) return;
-    setTimeout(() => toast.dismiss(toastId), 1000);
+    setTimeout(() => toast.dismiss(toastId), 2000);
   };
 
   const handleSubmit = async (e) => {
