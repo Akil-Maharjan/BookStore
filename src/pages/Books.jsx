@@ -153,7 +153,7 @@ export default function Books() {
   }, [data?.items, normalizedQuery]);
 
   return (
-    <div className="max-w-[1550px] mx-auto px-4 py-8">
+    <div className="max-w-[1550px] overflow-x-hidden mx-auto px-4 py-8">
       <div className="flex flex-col sm:flex-row gap-3 sm:items-center mb-4">
         <Background />
         <div className="flex-1 relative">

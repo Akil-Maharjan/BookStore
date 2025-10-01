@@ -40,7 +40,7 @@ const BookCard = ({ book }) => {
   };
   
   return (
-    <article className="rounded-xl max-w-[22rem] flex flex-col justify-center w-full overflow-hidden border backdrop-blur border-white hover:border-white/50 shadow-lg hover:shadow-black/30 transition" itemScope itemType="https://schema.org/Book">
+    <article className="rounded-xl max-w-[22rem]  flex flex-col justify-center w-full overflow-hidden border backdrop-blur border-white hover:border-white/50 shadow-lg hover:shadow-black/30 transition" itemScope itemType="https://schema.org/Book">
       <Link to={`/books/${_id}`} onClick={() => scrollTo({top: 0, behavior: 'smooth'})} className="block">
         <img src={coverUrl || '/placeholder.svg'} alt={title} className="h-80 w-full object-fit" />
       </Link>

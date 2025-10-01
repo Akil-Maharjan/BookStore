@@ -181,6 +181,12 @@ export default function BookDetail() {
 
   const submitLabel = isEditing ? 'Update' : 'Submit';
   const handleAddToCart = () => {
+    if(!user){
+      toast.error('Please login to add to cart');
+      navigate('/login');
+      scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     if (addToCartMut.isPending) return;
     addToCartMut.mutate();
   };

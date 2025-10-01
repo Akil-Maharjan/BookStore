@@ -14,8 +14,8 @@ const BookGrid = () => {
   const items = data?.items || [];
 
   return (
-    <section aria-labelledby="books-heading" className="py-10 lg:py-20">
-      <div className="max-w-[96rem] mx-auto px-4">
+    <section aria-labelledby="books-heading" className="py-10 lg:py-20 overflow-x-hidden">
+      <div className="max-w-[1550px] mx-auto px-4">
         
         <header className="mb-4 relative z-10" >
           <h2 id="books-heading" className="text-3xl font-poppins text-center sm:text-4xl md:text-6xl lg:text-[67px] font-extrabold host-grotesk mb-4">Featured Books</h2>

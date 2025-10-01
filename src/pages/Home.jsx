@@ -22,7 +22,7 @@ const Home = () => {
      
         {/* Content */}
         <div className="relative z-10 flex-1">
-          <div className="max-w-[1640px] mx-auto px-6 h-full  flex  items-center">
+          <div className="max-w-[1550px] mx-auto h-full  flex  items-center">
             <div className="w-full flex flex-col  lg:flex-row  items-center gap-8 md:gap-12 lg:gap-16">
               {/* Text (below image on md, left on lg) */}
               <RevealOnScroll direction="right" delay={0.1} className="flex-1 w-full 2xl:ml-10 lg:-mt-20 xl:-mt-25 lg:max-w-3xl lg:text-left  text-center  ">
