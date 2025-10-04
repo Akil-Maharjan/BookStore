@@ -2,7 +2,7 @@ import React from 'react';
 import { QrCode, Gift, BarChart3, Database, TrendingUp, Bell } from 'lucide-react';
 import RevealOnScroll from '../components/RevealOnScroll.jsx';
 
-export default function Features() {
+export default function Features({ sectionId = 'features', disableId = false, className = '' }) {
   const items = [
     { title: 'Beautiful UI', desc: 'Clean, modern, and responsive design inspired by top product shots.' },
     { title: 'Fast Search', desc: 'Find books by title, author, or category with server-side filters.' },
@@ -12,8 +12,13 @@ export default function Features() {
     { title: 'Local Payments', desc: 'Khalti/eSewa verification for a smooth checkout experience.' },
   ];
   const icons = [QrCode, Gift, BarChart3, Database, TrendingUp, Bell];
+  const id = disableId ? undefined : sectionId;
+
   return (
-    <section id='features' className=" max-w-[1910px]  mx-auto md:py-24 py-20 px-4 sm:px-6 lg:px-8">
+    <section
+      id={id}
+      className={`max-w-[1910px] mx-auto md:py-24 py-20 px-4 sm:px-6 lg:px-8 ${className}`}
+    >
       <div className="max-w-[1910px] mx-auto">
         {/* Section Header */}
         <RevealOnScroll direction="up" className="text-center relative z-10  lg:mb-9 mb-6">

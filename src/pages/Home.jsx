@@ -11,7 +11,7 @@ import RevealOnScroll from '../components/RevealOnScroll.jsx';
 const Home = () => {
   
   return (
-    <main className='max-w-[120rem]  mx-auto' id="main" role="main">
+    <main className='max-w-[120rem] mx-auto overflow-x-hidden' id="main" role="main">
       {/* Hero (full-bleed with background image and overlayed content) */}
       <section className="relative  mx-auto py-30 md:py-20 lg:py-0  flex">
         {/* Background image */}
@@ -63,22 +63,22 @@ const Home = () => {
       </section>
 
       {/* Bestsellers */}
-      <section id="books" className="px-0 relative z-10 pt-0 md:py-20 ">
+      <section id="books" className="px-0 relative z-10 pt-0 md:py-20 overflow-x-hidden">
         <RevealOnScroll direction="up">
           <BookGrid />
         </RevealOnScroll>
       </section>
-      <section id="about" className="px-0 relative z-10 pt-0 py-30 ">
+      <section id="about" className="px-0 relative z-10 pt-0 py-30 scroll-mt-40 overflow-x-hidden">
         <RevealOnScroll direction="up" delay={0.05}>
-          <About />
+          <About disableId />
         </RevealOnScroll>
       </section>
-      <section id="features" className="px-0 relative z-10 pt-0 py-30 ">
+      <section id="features" className="px-0 relative z-10 pt-0 py-30 scroll-mt-40 overflow-x-hidden">
         <RevealOnScroll direction="up" delay={0.05}>
-          <Features />
+          <Features disableId />
         </RevealOnScroll>
       </section>
-      <section id="contact" className="px-0 relative z-10 scroll-mt-40 pt-0 py-30 ">
+      <section id="contact" className="px-0 relative z-10 scroll-mt-40 pt-0 py-30 overflow-x-hidden">
         <RevealOnScroll direction="up" delay={0.05}>
           <Contact />
         </RevealOnScroll>
