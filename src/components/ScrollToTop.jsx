@@ -7,6 +7,11 @@ export default function ScrollToTop({ behavior = 'auto' }) {
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return;
 
+    if (window.__skipNextScrollTop) {
+      delete window.__skipNextScrollTop;
+      return;
+    }
+
     try {
       window.history.scrollRestoration = 'manual';
     } catch {

@@ -22,6 +22,7 @@ const Navbar = () => {
   const [active, setActive] = React.useState("");
   const [profileOpen, setProfileOpen] = React.useState(false);
   const profileRef = React.useRef(null);
+  const pendingScroll = React.useRef(null);
 
   const dismissAfterOneSecond = (toastId) => {
     if (!toastId) return;
@@ -78,24 +79,62 @@ const Navbar = () => {
   }, []);
 
   const scrollToId = (id, { suppressActive = false } = {}) => {
-    const go = () => {
+    const runScroll = () => {
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (suppressActive) {
+        setActive("");
+      } else {
+        const mappedKey = sectionKeyMap[id];
+        setActive(mappedKey ?? "");
+      }
     };
+
     if (location.pathname !== "/") {
+      if (typeof window !== "undefined") {
+        window.__skipNextScrollTop = true;
+      }
+      pendingScroll.current = { id, suppressActive };
       navigate("/");
-      setTimeout(go, 60);
+    } else if (typeof window !== "undefined") {
+      window.requestAnimationFrame(runScroll);
     } else {
-      go();
+      runScroll();
     }
+
     setOpen(false);
-    if (suppressActive) {
-      setActive("");
-      return;
-    }
-    const mappedKey = sectionKeyMap[id];
-    setActive(mappedKey ?? "");
   };
+
+  React.useEffect(() => {
+    if (location.pathname !== "/" || !pendingScroll.current) return;
+
+    const { id, suppressActive } = pendingScroll.current;
+    pendingScroll.current = null;
+
+    const attemptScroll = (tries = 0) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (suppressActive) {
+          setActive("");
+        } else {
+          const mappedKey = sectionKeyMap[id];
+          setActive(mappedKey ?? "");
+        }
+        return;
+      }
+
+      if (typeof window !== "undefined" && tries < 5) {
+        window.requestAnimationFrame(() => attemptScroll(tries + 1));
+      }
+    };
+
+    if (typeof window !== "undefined") {
+      window.requestAnimationFrame(() => attemptScroll());
+    } else {
+      attemptScroll();
+    }
+  }, [location.pathname, sectionKeyMap]);
 
   React.useEffect(() => {
     if (location.pathname.startsWith("/books")) {

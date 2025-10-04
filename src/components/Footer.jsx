@@ -11,7 +11,7 @@ const Footer = () => {
       role="contentinfo"
       className="mt-16"
     >
-      <div className="relative bg-slate-900  md:pr-20 max-w-[1910px] mx-auto  border-white/10  text-neutral-200">
+      <div className="relative overflow-hidden bg-slate-900  md:pr-20 max-w-[1910px] mx-auto  border-white/10  text-neutral-200">
         <div className="pointer-events-none  absolute inset-0 opacity-60">
           <div className="absolute -top-40 left-1/2 h-96 w-[36rem] -translate-x-1/2 rounded-full bg-sky-500/20 blur-[140px]" />
           <div className="absolute -bottom-32 right-1/3  w-full rounded-full bg-purple-500/10 blur-[120px]" />
