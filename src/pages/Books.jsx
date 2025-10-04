@@ -154,9 +154,9 @@ export default function Books() {
 
   return (
     <div className="max-w-[1550px] overflow-x-hidden mx-auto px-4 py-8">
-      <div className="flex flex-col sm:flex-row gap-3 sm:items-center mb-4">
+      <div className="flex flex-col  sm:flex-row gap-3 sm:items-center mb-4">
         <Background />
-        <div className="flex-1 relative">
+        <div className="flex-1 relative z-10">
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}

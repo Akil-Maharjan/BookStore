@@ -28,6 +28,20 @@ const Navbar = () => {
     setTimeout(() => toast.dismiss(toastId), 2000);
   };
 
+  const sectionOrder = React.useMemo(
+    () => [
+      { id: "about", key: "about" },
+      { id: "features", key: "features" },
+      { id: "contact", key: "contact" },
+    ],
+    []
+  );
+
+  const sectionKeyMap = React.useMemo(
+    () => Object.fromEntries([["main", ""], ...sectionOrder.map(({ id, key }) => [id, key])]),
+    [sectionOrder]
+  );
+
   const scrollTop = React.useCallback(() => {
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -63,7 +77,7 @@ const Navbar = () => {
     };
   }, []);
 
-  const scrollToId = (id) => {
+  const scrollToId = (id, { suppressActive = false } = {}) => {
     const go = () => {
       const el = document.getElementById(id);
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -75,9 +89,12 @@ const Navbar = () => {
       go();
     }
     setOpen(false);
-    if (["features", "about", "contact"].includes(id)) setActive(id);
-    else if (id === "main") setActive("home");
-    else setActive("");
+    if (suppressActive) {
+      setActive("");
+      return;
+    }
+    const mappedKey = sectionKeyMap[id];
+    setActive(mappedKey ?? "");
   };
 
   React.useEffect(() => {
@@ -90,40 +107,75 @@ const Navbar = () => {
       return;
     }
 
-    const ids = ["features", "about", "contact"];
     let frame = null;
+    const visibility = new Map();
 
-    const updateActiveSection = () => {
+    const updateFromVisibility = () => {
       frame = null;
-      const marker = window.innerHeight * 0.35;
-      let current = "";
-      for (const id of ids) {
-        const el = document.getElementById(id);
-        if (!el) continue;
-        const rect = el.getBoundingClientRect();
-        if (rect.top <= marker && rect.bottom >= marker) {
-          current = id;
-          break;
+      let bestKey = "";
+      let bestRatio = 0;
+
+      for (const { key } of sectionOrder) {
+        const ratio = visibility.get(key) ?? 0;
+        if (ratio > bestRatio + 0.0001) {
+          bestRatio = ratio;
+          bestKey = key;
         }
       }
-      setActive(current || "home");
+
+      if (bestRatio === 0) {
+        setActive("");
+      } else {
+        setActive(bestKey);
+      }
     };
 
     const scheduleUpdate = () => {
       if (frame !== null) return;
-      frame = window.requestAnimationFrame(updateActiveSection);
+      frame = window.requestAnimationFrame(updateFromVisibility);
     };
 
-    updateActiveSection();
-    window.addEventListener("scroll", scheduleUpdate, { passive: true });
-    window.addEventListener("resize", scheduleUpdate);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const mapped = sectionKeyMap[entry.target.id];
+          if (mapped === undefined) return;
+          if (entry.isIntersecting) {
+            visibility.set(mapped, entry.intersectionRatio);
+          } else {
+            visibility.delete(mapped);
+          }
+        });
+        scheduleUpdate();
+      },
+      {
+        root: null,
+        threshold: [0.2, 0.4, 0.6, 0.8],
+        rootMargin: "-25% 0px -40% 0px",
+      }
+    );
+
+    sectionOrder.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    const handleScrollTop = () => {
+      if (window.scrollY < 120) {
+        visibility.clear();
+        setActive("");
+      }
+    };
+
+    window.addEventListener("scroll", handleScrollTop, { passive: true });
+    scheduleUpdate();
 
     return () => {
       if (frame !== null) window.cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", scheduleUpdate);
-      window.removeEventListener("resize", scheduleUpdate);
+      observer.disconnect();
+      window.removeEventListener("scroll", handleScrollTop);
     };
-  }, [location.pathname]);
+  }, [location.pathname, sectionOrder, sectionKeyMap]);
 
   const baseLink =
     "group px-3 py-2 cursor-pointer rounded flex items-center gap-2 text-sm font-poppins transition-colors";
@@ -141,15 +193,8 @@ const Navbar = () => {
             to="/"
             className="font-extrabold tracking-wide"
             onClick={(e) => {
-              if (location.pathname === "/") {
-                e.preventDefault();
-                const main = document.getElementById("main") || document.body;
-                (main?.scrollIntoView ? main : document.documentElement).scrollIntoView(
-                  { behavior: "smooth", block: "start" }
-                );
-              } else {
-                scrollToId("main");
-              }
+              e.preventDefault();
+              scrollToId("main", { suppressActive: true });
             }}
           >
             <img src={logo} alt="" className="w-25 h-25"/>

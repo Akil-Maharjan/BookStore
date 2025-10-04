@@ -11,7 +11,7 @@ import RevealOnScroll from '../components/RevealOnScroll.jsx';
 const Home = () => {
   
   return (
-    <main className='max-w-[120rem] mx-auto' id="main" role="main">
+    <main className='max-w-[120rem]  mx-auto' id="main" role="main">
       {/* Hero (full-bleed with background image and overlayed content) */}
       <section className="relative  mx-auto py-30 md:py-20 lg:py-0  flex">
         {/* Background image */}
@@ -34,7 +34,18 @@ const Home = () => {
                 </p>
                 <div className="mt-10  flex flex-wrap items-center justify-center lg:justify-start gap-4">
                   <Link to="/books"   className="px-6 group  py-3.5 rounded-2xl font-inter bg-rose-500 flex gap-2  text-lg  font-semibold hover:opacity-90">Shop Now <ShoppingBag className="group-hover:scale-[1.1] group-active:animate-ping"  /></Link>
-                  <button onClick={() => window.scrollTo({ top: document.getElementById('features')?.offsetTop ?? 0, behavior: 'smooth' })} className="px-6 py-3.5 cursor-pointer rounded-2xl font-inter bg-white/90 text-slate-900 text-lg font-semibold hover:bg-white">Explore Features</button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const target = document.getElementById('features');
+                      if (target) {
+                        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                    }}
+                    className="px-6 py-3.5 cursor-pointer rounded-2xl font-inter bg-white/90 text-slate-900 text-lg font-semibold hover:bg-white"
+                  >
+                    Explore Features
+                  </button>
                 </div>
               </RevealOnScroll>
               {/* Image (top on md, right on lg) */}
@@ -52,22 +63,22 @@ const Home = () => {
       </section>
 
       {/* Bestsellers */}
-      <section id="books" className="px-0 pt-0 md:py-20 ">
+      <section id="books" className="px-0 relative z-10 pt-0 md:py-20 ">
         <RevealOnScroll direction="up">
           <BookGrid />
         </RevealOnScroll>
       </section>
-      <section id="about" className="px-0 pt-0 py-30 ">
+      <section id="about" className="px-0 relative z-10 pt-0 py-30 ">
         <RevealOnScroll direction="up" delay={0.05}>
           <About />
         </RevealOnScroll>
       </section>
-      <section id="features" className="px-0  pt-0 py-30 ">
+      <section id="features" className="px-0 relative z-10 pt-0 py-30 ">
         <RevealOnScroll direction="up" delay={0.05}>
           <Features />
         </RevealOnScroll>
       </section>
-      <section id="contact" className="px-0  scroll-mt-40 pt-0 py-30 ">
+      <section id="contact" className="px-0 relative z-10 scroll-mt-40 pt-0 py-30 ">
         <RevealOnScroll direction="up" delay={0.05}>
           <Contact />
         </RevealOnScroll>

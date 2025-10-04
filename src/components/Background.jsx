@@ -9,7 +9,7 @@ export default function Background({
     <img
       src={src}
       alt={alt}
-      className={`fixed inset-0 w-full blur-sm  h-full bg-slate-800 object-contain ${className}`}
+      className={`fixed inset-0 w-full h-full -z-10 pointer-events-none select-none blur-sm bg-slate-800 object-contain ${className}`}
       fetchpriority="high"
       aria-hidden="true"
     />
