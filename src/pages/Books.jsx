@@ -29,6 +29,9 @@ export default function Books() {
 
   const [addingBookId, setAddingBookId] = useState(null);
 
+  const topAnchorRef = React.useRef(null);
+  const hasScrolledOnPageChangeRef = React.useRef(false);
+
   const triggerCartSuccess = React.useCallback(() => {
     cartButtonControls.start({
       scale: [1, 1.08, 1],
@@ -45,7 +48,17 @@ export default function Books() {
       transition: { duration: 0.6, ease: 'easeOut' },
     });
   }, [cartButtonControls, cartIconControls]);
+  const scrollPageTop = React.useCallback(() => {
+    if (typeof window === 'undefined') return;
 
+    requestAnimationFrame(() => {
+      if (topAnchorRef.current) {
+        topAnchorRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+      }
+    });
+  }, []);
   const triggerClick = (bookId) => {
     if (addingBookId) return;
     handleAddToCart(bookId);
@@ -152,8 +165,17 @@ export default function Books() {
       .slice(0, 8);
   }, [data?.items, normalizedQuery]);
 
+  React.useEffect(() => {
+    if (!hasScrolledOnPageChangeRef.current) {
+      hasScrolledOnPageChangeRef.current = true;
+      return;
+    }
+    scrollPageTop();
+  }, [page, scrollPageTop]);
+
   return (
     <div className="max-w-[1550px] overflow-x-hidden mx-auto px-4 py-8">
+      <span ref={topAnchorRef} className="block h-0" aria-hidden="true" />
       <div className="flex flex-col  sm:flex-row gap-3 sm:items-center mb-4">
         <Background />
         <div className="flex-1 relative z-10">
@@ -335,7 +357,7 @@ export default function Books() {
               key={i}
               onClick={() => {
                 setPage(i + 1);
-                scrollTo({ top: 0, behavior: 'smooth' });
+                scrollPageTop();
               }}
               className={`px-3 py-1 bg-slate-800 cursor-pointer rounded border ${
                 page === i + 1

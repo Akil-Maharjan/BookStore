@@ -33,15 +33,38 @@ const BookGrid = () => {
         ) : items.length === 0 ? (
           <div className="text-center py-16 text-white/70">No books found.</div>
         ) : (
-          <div className="grid place-self-center sm:place-self-auto  mt-10 grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" role="list">
-            {items.map((book) => (
-              <div role="listitem" key={book._id}>
-                <BookCard book={book} />  
+          <>
+            <div className="featured-books-scroll block md:hidden mt-10 overflow-x-auto pb-4 -mx-4 px-4" role="list">
+              <div className="flex gap-4 w-max">
+                {items.map((book) => (
+                  <div role="listitem" key={book._id} className="flex-shrink-0 w-[20rem]">
+                    <BookCard book={book} />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+
+            <div className="hidden ml-6 md:grid mt-10 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" role="list">
+              {items.map((book) => (
+                <div role="listitem" key={book._id}>
+                  <BookCard book={book} />  
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
+      <style>
+        {`
+          .featured-books-scroll {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+          .featured-books-scroll::-webkit-scrollbar {
+            display: none;
+          }
+        `}
+      </style>
     </section>
   );
 };

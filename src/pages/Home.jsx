@@ -13,7 +13,7 @@ const Home = () => {
   return (
     <main className='max-w-[120rem] mx-auto overflow-x-hidden' id="main" role="main">
       {/* Hero (full-bleed with background image and overlayed content) */}
-      <section className="relative  mx-auto py-30 md:py-20 lg:py-0  flex">
+      <section className="relative  mx-auto py-10  md:py-20 lg:py-0  flex">
         {/* Background image */}
         <Background />
         {/* Overlay to improve text contrast */}
@@ -63,7 +63,7 @@ const Home = () => {
       </section>
 
       {/* Bestsellers */}
-      <section id="books" className="px-0 relative z-10 pt-0 md:py-20 overflow-x-hidden">
+      <section id="books" className="px-0 relative z-10 pt-0 md:py-10 overflow-x-hidden">
         <RevealOnScroll direction="up">
           <BookGrid />
         </RevealOnScroll>
