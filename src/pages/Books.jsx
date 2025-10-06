@@ -291,14 +291,16 @@ export default function Books() {
                     </Link>
 
                     <div
-                      className={`absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/75 to-slate-950/15 backdrop-blur-sm opacity-0 transition-opacity duration-500 pointer-events-none ${
-                        isExpanded ? 'opacity-100' : 'md:group-hover:opacity-100'
+                      className={`absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/75 to-slate-950/15 backdrop-blur-sm transition-opacity duration-500 pointer-events-none ${
+                        isExpanded ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'
                       }`}
                     />
 
                     <div
-                      className={`absolute inset-0 flex flex-col justify-end min-h-full px-0 pt-10 pb-4 gap-4 translate-y-8 opacity-0 transition-all duration-500 pointer-events-none overflow-y-auto md:overflow-visible md:pt-8 md:pb-5 md:gap-4 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-hover:pointer-events-auto ${
-                        isExpanded ? 'translate-y-0 opacity-100 pointer-events-auto' : ''
+                      className={`absolute inset-0 flex flex-col justify-end min-h-full px-0 pt-10 pb-4 gap-4 transition-all duration-500 overflow-y-auto md:overflow-visible md:pt-8 md:pb-5 md:gap-4 ${
+                        isExpanded
+                          ? 'pointer-events-auto translate-y-0 opacity-100'
+                          : 'pointer-events-none translate-y-8 opacity-0 md:pointer-events-none md:group-hover:pointer-events-auto md:group-hover:translate-y-0 md:group-hover:opacity-100'
                       }`}
                       onClick={handleOverlayClick}
                     >
@@ -328,9 +330,12 @@ export default function Books() {
                           type="button"
                           onClick={(event) => {
                             event.stopPropagation();
-                            setExpandedCard(null);
+                            if (isMdUp()) {
+                              setExpandedCard(null);
+                            }
                             triggerClick(b._id);
                           }}
+                          onPointerDown={(event) => event.stopPropagation()}
                           disabled={addingBookId === b._id}
                           aria-busy={addingBookId === b._id}
                           className="group/add rounded overflow-hidden font-poppins bg-brand hover:bg-brand-dark text-sm flex items-center disabled:opacity-60 disabled:cursor-not-allowed"
@@ -338,6 +343,7 @@ export default function Books() {
                           <Motion.span
                             className="group/add flex border bg-slate-900 hover:bg-slate-500 w-[150px] cursor-pointer items-center justify-between border-white/50 rounded px-3 py-2 gap-2"
                             style={{ transformOrigin: 'center' }}
+                            onPointerDown={(event) => event.stopPropagation()}
                           >
                             <Motion.span
                               animate={
@@ -369,9 +375,12 @@ export default function Books() {
                           to={`/books/${b._id}`}
                           onClick={(event) => {
                             event.stopPropagation();
-                            setExpandedCard(null);
+                            if (isMdUp()) {
+                              setExpandedCard(null);
+                            }
                             scrollTo({ top: 0, behavior: 'smooth' });
                           }}
+                          onPointerDown={(event) => event.stopPropagation()}
                           className="flex rounded-md cursor-pointer justify-center items-center gap-2 border border-white/20 px-6 py-2 text-sm font-poppins text-white/80 hover:text-white bg-slate-900 hover:bg-slate-500 hover:border-white/40 transition"
                         >
                           View Details

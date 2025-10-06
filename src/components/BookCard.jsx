@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -14,6 +14,7 @@ const BookCard = ({ book }) => {
   const navigate = useNavigate();
   const [clicked, setClicked] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const cardId = useMemo(() => `book-card-${_id}`, [_id]);
 
   const coverImage = coverUrl || '/placeholder.svg';
   const formattedPrice = Number(price_npr ?? 0).toLocaleString();
@@ -70,7 +71,15 @@ const BookCard = ({ book }) => {
   const handleImageClick = (event) => {
     if (!isMdUp()) {
       event.preventDefault();
-      setIsExpanded((prev) => !prev);
+      setIsExpanded((prev) => {
+        const next = !prev;
+        if (next) {
+          window.dispatchEvent(
+            new CustomEvent('book-card-expanded', { detail: cardId })
+          );
+        }
+        return next;
+      });
       return;
     }
 
@@ -86,6 +95,19 @@ const BookCard = ({ book }) => {
       setIsExpanded(false);
     }
   };
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+
+    const handleExternalExpand = (event) => {
+      if (event.detail !== cardId) {
+        setIsExpanded(false);
+      }
+    };
+
+    window.addEventListener('book-card-expanded', handleExternalExpand);
+    return () => window.removeEventListener('book-card-expanded', handleExternalExpand);
+  }, [cardId]);
 
   return (
     <article
@@ -108,14 +130,16 @@ const BookCard = ({ book }) => {
       </Link>
 
       <div
-        className={`absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/75 to-slate-950/15 backdrop-blur-sm opacity-0 transition-opacity duration-500 pointer-events-none ${
-          isExpanded ? 'opacity-100' : 'md:group-hover:opacity-100'
+        className={`absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/75 to-slate-950/15 backdrop-blur-sm transition-opacity duration-500 pointer-events-none ${
+          isExpanded ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'
         }`}
       />
 
       <div
-        className={`absolute inset-0 flex flex-col justify-end min-h-full px-0 pt-10 pb-4 gap-4 translate-y-8 opacity-0 transition-all duration-500 pointer-events-none overflow-y-auto md:overflow-visible md:pt-8 md:pb-5 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-hover:pointer-events-auto ${
-          isExpanded ? 'translate-y-0 opacity-100 pointer-events-auto' : ''
+        className={`absolute inset-0 flex flex-col justify-end min-h-full px-0 pt-10 pb-4 gap-4 transition-all duration-500 overflow-y-auto md:overflow-visible md:pt-8 md:pb-5 ${
+          isExpanded
+            ? 'pointer-events-auto translate-y-0 opacity-100'
+            : 'pointer-events-none translate-y-8 opacity-0 md:pointer-events-none md:group-hover:pointer-events-auto md:group-hover:translate-y-0 md:group-hover:opacity-100'
         }`}
         onClick={handleOverlayClick}
       >
@@ -150,38 +174,55 @@ const BookCard = ({ book }) => {
         </div>
 
         <div className="flex justify-between gap-2 px-4 sm:px-6 mb-8 md:mb-0">
-          <Motion.button
-            type="button"
-            onClick={handleAddToCart}
-            disabled={addMut.isPending}
-            aria-busy={addMut.isPending}
-            className="group/add rounded overflow-hidden font-poppins cursor-pointer bg-brand hover:bg-brand-dark text-sm flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            <Motion.span
-              className="group/add flex border bg-slate-900 hover:bg-slate-500 w-[150px] items-center justify-between border-white rounded px-3 py-2 gap-2"
-              style={{ transformOrigin: 'center' }}
+          <div className="relative">
+            <Motion.button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                event.nativeEvent.stopImmediatePropagation();
+                if (!addMut.isPending) {
+                  handleAddToCart();
+                }
+              }}
+              onPointerDown={(event) => {
+                event.stopPropagation();
+                event.nativeEvent.stopImmediatePropagation();
+              }}
+              disabled={addMut.isPending}
+              aria-busy={addMut.isPending}
+              className="group relative rounded cursor-pointer overflow-hidden font-poppins bg-transparent text-sm flex items-center disabled:opacity-60 disabled:cursor-not-allowed w-full"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               <Motion.span
-                animate={clicked ? { x: 150, rotate: -30 } : { x: 0, rotate: 0 }}
-                transition={{ duration: 0.5, ease: 'easeInOut' }}
-                className="shrink-0"
+                className="flex border bg-slate-900 hover:bg-slate-500 w-full items-center justify-between border-white/50 rounded px-3 py-2 gap-2"
+                style={{ transformOrigin: 'center' }}
               >
-                <ShoppingCart className="w-5 h-5" />
+                <Motion.span
+                  animate={clicked ? { x: 150, rotate: -30 } : { x: 0, rotate: 0 }}
+                  transition={{ duration: 0.5, ease: 'easeInOut' }}
+                  className="shrink-0"
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                </Motion.span>
+                <Motion.p
+                  animate={clicked ? { opacity: 0 } : { opacity: 1 }}
+                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  className="flex-1 font-poppins truncate text-center"
+                  title="Add to Cart"
+                >
+                  {addMut.isPending ? 'Adding…' : 'Add to Cart'}
+                </Motion.p>
               </Motion.span>
-              <Motion.p
-                animate={clicked ? { opacity: 0 } : { opacity: 1 }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className="flex-1 font-poppins truncate text-center"
-                title="Add to Cart"
-              >
-                {addMut.isPending ? 'Adding…' : 'Add to Cart'}
-              </Motion.p>
-            </Motion.span>
-          </Motion.button>
+            </Motion.button>
+          </div>
 
           <Link
             to={`/books/${_id}`}
-            onClick={() => scrollTo({ top: 0, behavior: 'smooth' })}
+            onClick={(event) => {
+              event.stopPropagation();
+              scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            onPointerDown={(event) => event.stopPropagation()}
             className="px-9 flex items-center justify-center text-center rounded border bg-slate-900 hover:bg-slate-500 text-sm"
           >
             Details
