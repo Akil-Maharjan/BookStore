@@ -49,9 +49,9 @@ export default function Books() {
       transition: { duration: 0.6, ease: 'easeOut' },
     });
   }, [cartButtonControls, cartIconControls]);
+
   const scrollPageTop = React.useCallback(() => {
     if (typeof window === 'undefined') return;
-
     requestAnimationFrame(() => {
       if (topAnchorRef.current) {
         topAnchorRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -60,6 +60,7 @@ export default function Books() {
       }
     });
   }, []);
+
   const triggerClick = (bookId) => {
     if (addingBookId) return;
     handleAddToCart(bookId);
@@ -72,20 +73,20 @@ export default function Books() {
     setTimeout(() => toast.dismiss(toastId), 1000);
   };
 
-  const isMdUp = () => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches;
+  // 🔹 consider desktop only for hover — everything else expands on click
+  const isDesktop = () =>
+    typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches;
 
   useEffect(() => {
     const handleResize = () => {
-      if (isMdUp()) {
+      if (isDesktop()) {
         setExpandedCard(null);
       }
     };
-
     handleResize();
     if (typeof window !== 'undefined') {
       window.addEventListener('resize', handleResize);
     }
-
     return () => {
       if (typeof window !== 'undefined') {
         window.removeEventListener('resize', handleResize);
@@ -107,12 +108,14 @@ export default function Books() {
       });
     },
     onSuccess: () => {
-     const toastId = toast.success('Added to cart');
-     dismissAfterOneSecond(toastId);
+      const toastId = toast.success('Added to cart');
+      dismissAfterOneSecond(toastId);
       qc.invalidateQueries({ queryKey: ['cart'] });
       triggerCartSuccess();
     },
-    onError: (err) => { toast.error(err?.response?.data?.message || 'Failed to add to cart'); },
+    onError: (err) => {
+      toast.error(err?.response?.data?.message || 'Failed to add to cart');
+    },
     onSettled: () => {
       setAddingBookId(null);
       dismissAfterOneSecond();
@@ -174,9 +177,7 @@ export default function Books() {
   }, [data?.items, normalizedQuery]);
   const pages = data?.pages || 1;
 
- 
-
-  React.useEffect(() => {
+  useEffect(() => {
     if (!hasScrolledOnPageChangeRef.current) {
       hasScrolledOnPageChangeRef.current = true;
       return;
@@ -187,7 +188,7 @@ export default function Books() {
   return (
     <div className="max-w-[1550px] overflow-x-hidden mx-auto px-4 py-8">
       <span ref={topAnchorRef} className="block h-0" aria-hidden="true" />
-      <div className="flex flex-col  sm:flex-row gap-3 sm:items-center mb-4">
+      <div className="flex flex-col sm:flex-row gap-3 sm:items-center mb-4">
         <Background />
         <div className="flex-1 relative z-10">
           <input
@@ -196,7 +197,6 @@ export default function Books() {
             placeholder="Search books..."
             className="max-w-[30rem] w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:bg-slate-900 dark:border-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:ring-slate-600"
           />
-          
         </div>
         <div className="relative z-10 flex gap-2 mt-2 sm:mt-0">
           <div>
@@ -218,7 +218,6 @@ export default function Books() {
         </div>
       </div>
 
-      {/* category pills */}
       <div className="mb-6 overflow-x-auto scroll-hide relative z-10">
         <div className="flex gap-2 w-max">
           {categories.map((c) => (
@@ -253,19 +252,17 @@ export default function Books() {
                 const isExpanded = expandedCard === b._id;
 
                 const handleImageClick = (event) => {
-                  if (!isMdUp()) {
-                    event.preventDefault();
+                  event.preventDefault();
+                  if (!isDesktop()) {
                     setExpandedCard((prev) => (prev === b._id ? null : b._id));
                     return;
                   }
-
                   scrollTo({ top: 0, behavior: 'smooth' });
                 };
 
                 const handleOverlayClick = (event) => {
                   if (event.target !== event.currentTarget) return;
-
-                  if (isMdUp()) {
+                  if (isDesktop()) {
                     goToDetails();
                   } else {
                     setExpandedCard(null);
@@ -284,7 +281,7 @@ export default function Books() {
                       className="block h-full"
                     >
                       <img
-                        className="h-full w-full object-cover transition-transform duration-500 md:group-hover:scale-105"
+                        className="h-full w-full object-cover transition-transform duration-500 lg:group-hover:scale-105"
                         src={b.coverUrl || '/placeholder.svg'}
                         alt={b.title}
                       />
@@ -292,19 +289,19 @@ export default function Books() {
 
                     <div
                       className={`absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/75 to-slate-950/15 backdrop-blur-sm transition-opacity duration-500 pointer-events-none ${
-                        isExpanded ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'
+                        isExpanded ? 'opacity-100' : 'opacity-0 lg:group-hover:opacity-100'
                       }`}
                     />
 
                     <div
-                      className={`absolute inset-0 flex flex-col justify-end min-h-full px-0 pt-10 pb-4 gap-4 transition-all duration-500 overflow-y-auto md:overflow-visible md:pt-8 md:pb-5 md:gap-4 ${
+                      className={`absolute inset-0 flex flex-col justify-end min-h-full px-0 pt-10 pb-4 gap-4 transition-all duration-500 overflow-y-auto lg:overflow-visible lg:pt-8 lg:pb-5 lg:gap-4 ${
                         isExpanded
                           ? 'pointer-events-auto translate-y-0 opacity-100'
-                          : 'pointer-events-none translate-y-8 opacity-0 md:pointer-events-none md:group-hover:pointer-events-auto md:group-hover:translate-y-0 md:group-hover:opacity-100'
+                          : 'pointer-events-none translate-y-8 opacity-0 lg:pointer-events-none lg:group-hover:pointer-events-auto lg:group-hover:translate-y-0 lg:group-hover:opacity-100'
                       }`}
                       onClick={handleOverlayClick}
                     >
-                      <div className="flex flex-col gap-3 w-full bg-slate-950/70 backdrop-blur-md px-4 sm:px-6 py-5 text-white shadow-lg md:shadow-none">
+                      <div className="flex flex-col gap-3 w-full bg-slate-950/70 backdrop-blur-md px-4 sm:px-6 py-5 text-white shadow-lg lg:shadow-none">
                         <h3 className="text-2xl font-poppins font-bold line-clamp-2">
                           {b.title}
                         </h3>
@@ -312,27 +309,25 @@ export default function Books() {
                           by
                           <span className="font-bold text-white">&quot;{b.author}&quot;</span>
                         </p>
-                        {b.category != null && (
+                        {b.category && (
                           <p className="text-md text-white/70 font-poppins">
                             {b.category}
                           </p>
                         )}
-                        {b.price_npr != null && (
+                        {b.price_npr && (
                           <p className="text-brand flex gap-2 font-bold font-poppins">
-                            <span className="font-poppins">Rs.</span>{' '}
+                            <span>Rs.</span>{' '}
                             {Number(b.price_npr ?? 0).toLocaleString()}
                           </p>
                         )}
                       </div>
 
-                      <div className="flex justify-between gap-2 px-4 sm:px-6 mb-8 md:mb-0">
+                      <div className="flex justify-between gap-2 px-4 sm:px-6 mb-8 lg:mb-0">
                         <Motion.button
                           type="button"
                           onClick={(event) => {
                             event.stopPropagation();
-                            if (isMdUp()) {
-                              setExpandedCard(null);
-                            }
+                            if (isDesktop()) setExpandedCard(null);
                             triggerClick(b._id);
                           }}
                           onPointerDown={(event) => event.stopPropagation()}
@@ -375,9 +370,7 @@ export default function Books() {
                           to={`/books/${b._id}`}
                           onClick={(event) => {
                             event.stopPropagation();
-                            if (isMdUp()) {
-                              setExpandedCard(null);
-                            }
+                            if (isDesktop()) setExpandedCard(null);
                             scrollTo({ top: 0, behavior: 'smooth' });
                           }}
                           onPointerDown={(event) => event.stopPropagation()}

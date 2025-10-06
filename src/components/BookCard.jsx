@@ -25,7 +25,8 @@ const BookCard = ({ book }) => {
       toast.success('Added to cart', { duration: 2000 });
       qc.invalidateQueries({ queryKey: ['cart'] });
     },
-    onError: (err) => toast.error(err?.response?.data?.message || 'Failed to add to cart'),
+    onError: (err) =>
+      toast.error(err?.response?.data?.message || 'Failed to add to cart'),
   });
 
   const handleAddToCart = () => {
@@ -42,11 +43,14 @@ const BookCard = ({ book }) => {
     setTimeout(() => setClicked(false), 600);
   };
 
-  const isMdUp = () => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches;
+  // ✅ Now hover behavior only for screens >= 1025px (desktop)
+  const isLgUp = () =>
+    typeof window !== 'undefined' &&
+    window.matchMedia('(min-width: 1025px)').matches;
 
   useEffect(() => {
     const handleResize = () => {
-      if (isMdUp()) {
+      if (isLgUp()) {
         setIsExpanded(false);
       }
     };
@@ -69,7 +73,7 @@ const BookCard = ({ book }) => {
   };
 
   const handleImageClick = (event) => {
-    if (!isMdUp()) {
+    if (!isLgUp()) {
       event.preventDefault();
       setIsExpanded((prev) => {
         const next = !prev;
@@ -89,7 +93,7 @@ const BookCard = ({ book }) => {
   const handleOverlayClick = (event) => {
     if (event.target !== event.currentTarget) return;
 
-    if (isMdUp()) {
+    if (isLgUp()) {
       goToDetails();
     } else {
       setIsExpanded(false);
@@ -106,7 +110,8 @@ const BookCard = ({ book }) => {
     };
 
     window.addEventListener('book-card-expanded', handleExternalExpand);
-    return () => window.removeEventListener('book-card-expanded', handleExternalExpand);
+    return () =>
+      window.removeEventListener('book-card-expanded', handleExternalExpand);
   }, [cardId]);
 
   return (
@@ -124,27 +129,30 @@ const BookCard = ({ book }) => {
         <img
           src={coverImage}
           alt={title}
-          className="h-full w-full object-cover transition-transform duration-500 md:group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-500 lg:group-hover:scale-105"
           itemProp="image"
         />
       </Link>
 
       <div
         className={`absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/75 to-slate-950/15 backdrop-blur-sm transition-opacity duration-500 pointer-events-none ${
-          isExpanded ? 'opacity-100' : 'opacity-0 md:group-hover:opacity-100'
+          isExpanded ? 'opacity-100' : 'opacity-0 lg:group-hover:opacity-100'
         }`}
       />
 
       <div
-        className={`absolute inset-0 flex flex-col justify-end min-h-full px-0 pt-10 pb-4 gap-4 transition-all duration-500 overflow-y-auto md:overflow-visible md:pt-8 md:pb-5 ${
+        className={`absolute inset-0 flex flex-col justify-end min-h-full px-0 pt-10 pb-4 gap-4 transition-all duration-500 overflow-y-auto lg:overflow-visible lg:pt-8 lg:pb-5 ${
           isExpanded
             ? 'pointer-events-auto translate-y-0 opacity-100'
-            : 'pointer-events-none translate-y-8 opacity-0 md:pointer-events-none md:group-hover:pointer-events-auto md:group-hover:translate-y-0 md:group-hover:opacity-100'
+            : 'pointer-events-none translate-y-8 opacity-0 lg:pointer-events-none lg:group-hover:pointer-events-auto lg:group-hover:translate-y-0 lg:group-hover:opacity-100'
         }`}
         onClick={handleOverlayClick}
       >
-        <div className="flex flex-col gap-3 w-full bg-slate-950/70 backdrop-blur-md px-4 sm:px-6 py-5 text-white shadow-lg md:shadow-none">
-          <h3 className="text-2xl font-poppins font-bold line-clamp-2" itemProp="name">
+        <div className="flex flex-col gap-3 w-full bg-slate-950/70 backdrop-blur-md px-4 sm:px-6 py-5 text-white shadow-lg lg:shadow-none">
+          <h3
+            className="text-2xl font-poppins font-bold line-clamp-2"
+            itemProp="name"
+          >
             {title}
           </h3>
           <p className="text-md flex flex-wrap gap-2 font-medium text-white/70 font-poppins">
@@ -154,9 +162,7 @@ const BookCard = ({ book }) => {
             </span>
           </p>
           {category && (
-            <p className="text-md text-white/70 font-poppins">
-              {category}
-            </p>
+            <p className="text-md text-white/70 font-poppins">{category}</p>
           )}
           <p
             className="text-brand flex gap-2 font-bold font-poppins"
@@ -173,7 +179,7 @@ const BookCard = ({ book }) => {
           </p>
         </div>
 
-        <div className="flex justify-between gap-2 px-4 sm:px-6 mb-8 md:mb-0">
+        <div className="flex justify-between gap-2 px-4 sm:px-6 mb-8 lg:mb-0">
           <div className="relative">
             <Motion.button
               type="button"
@@ -198,7 +204,9 @@ const BookCard = ({ book }) => {
                 style={{ transformOrigin: 'center' }}
               >
                 <Motion.span
-                  animate={clicked ? { x: 150, rotate: -30 } : { x: 0, rotate: 0 }}
+                  animate={
+                    clicked ? { x: 150, rotate: -30 } : { x: 0, rotate: 0 }
+                  }
                   transition={{ duration: 0.5, ease: 'easeInOut' }}
                   className="shrink-0"
                 >
