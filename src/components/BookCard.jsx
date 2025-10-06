@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion as Motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -13,6 +13,7 @@ const BookCard = ({ book }) => {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [clicked, setClicked] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const coverImage = coverUrl || '/placeholder.svg';
   const formattedPrice = Number(price_npr ?? 0).toLocaleString();
@@ -40,9 +41,50 @@ const BookCard = ({ book }) => {
     setTimeout(() => setClicked(false), 600);
   };
 
+  const isMdUp = () => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches;
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (isMdUp()) {
+        setIsExpanded(false);
+      }
+    };
+
+    handleResize();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', handleResize);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', handleResize);
+      }
+    };
+  }, []);
+
   const goToDetails = () => {
     scrollTo({ top: 0, behavior: 'smooth' });
     navigate(`/books/${_id}`);
+  };
+
+  const handleImageClick = (event) => {
+    if (!isMdUp()) {
+      event.preventDefault();
+      setIsExpanded((prev) => !prev);
+      return;
+    }
+
+    scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleOverlayClick = (event) => {
+    if (event.target !== event.currentTarget) return;
+
+    if (isMdUp()) {
+      goToDetails();
+    } else {
+      setIsExpanded(false);
+    }
   };
 
   return (
@@ -50,31 +92,34 @@ const BookCard = ({ book }) => {
       className="group relative rounded-xl max-w-[22rem] h-[550px] flex flex-col justify-center w-full overflow-hidden border backdrop-blur border-white hover:border-white/50 shadow-lg hover:shadow-white/30 transition-all duration-500"
       itemScope
       itemType="https://schema.org/Book"
+      aria-expanded={isExpanded}
     >
       <Link
         to={`/books/${_id}`}
-        onClick={() => scrollTo({ top: 0, behavior: 'smooth' })}
+        onClick={handleImageClick}
         className="block h-full"
       >
         <img
           src={coverImage}
           alt={title}
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-500 md:group-hover:scale-105"
           itemProp="image"
         />
       </Link>
 
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/75 to-slate-950/15 backdrop-blur-sm opacity-0 transition-opacity duration-500 group-hover:opacity-100 pointer-events-none" />
+      <div
+        className={`absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/75 to-slate-950/15 backdrop-blur-sm opacity-0 transition-opacity duration-500 pointer-events-none ${
+          isExpanded ? 'opacity-100' : 'md:group-hover:opacity-100'
+        }`}
+      />
 
       <div
-        className="absolute inset-0 flex flex-col justify-end px-0 pb-5 pt-8 gap-4 translate-y-8 opacity-0 transition-all duration-500 pointer-events-none group-hover:translate-y-0 group-hover:opacity-100 group-hover:pointer-events-auto"
-        onClick={(event) => {
-          if (event.target === event.currentTarget) {
-            goToDetails();
-          }
-        }}
+        className={`absolute inset-0 flex flex-col justify-end min-h-full px-0 pt-10 pb-4 gap-4 translate-y-8 opacity-0 transition-all duration-500 pointer-events-none overflow-y-auto md:overflow-visible md:pt-8 md:pb-5 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-hover:pointer-events-auto ${
+          isExpanded ? 'translate-y-0 opacity-100 pointer-events-auto' : ''
+        }`}
+        onClick={handleOverlayClick}
       >
-        <div className="flex flex-col gap-3 w-full bg-slate-950/70 backdrop-blur-md px-4 sm:px-6 py-5 text-white">
+        <div className="flex flex-col gap-3 w-full bg-slate-950/70 backdrop-blur-md px-4 sm:px-6 py-5 text-white shadow-lg md:shadow-none">
           <h3 className="text-2xl font-poppins font-bold line-clamp-2" itemProp="name">
             {title}
           </h3>
@@ -104,7 +149,7 @@ const BookCard = ({ book }) => {
           </p>
         </div>
 
-        <div className="flex justify-between gap-2 px-4 sm:px-6">
+        <div className="flex justify-between gap-2 px-4 sm:px-6 mb-8 md:mb-0">
           <Motion.button
             type="button"
             onClick={handleAddToCart}

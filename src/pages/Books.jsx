@@ -22,6 +22,7 @@ export default function Books() {
   const [category, setCategory] = useState('All');
   const qc = useQueryClient();
   const [clickedCard, setClickedCard] = useState(null);
+  const [expandedCard, setExpandedCard] = useState(null);
   const user = useAuth((s) => s.user);
   
   const cartButtonControls = useAnimationControls();
@@ -70,6 +71,27 @@ export default function Books() {
     if (!toastId) return;
     setTimeout(() => toast.dismiss(toastId), 1000);
   };
+
+  const isMdUp = () => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches;
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (isMdUp()) {
+        setExpandedCard(null);
+      }
+    };
+
+    handleResize();
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', handleResize);
+    }
+
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', handleResize);
+      }
+    };
+  }, []);
 
   const addMut = useMutation({
     mutationFn: (bookId) => addToCart(bookId, 1),
@@ -228,34 +250,59 @@ export default function Books() {
                   navigate(`/books/${b._id}`);
                 };
 
+                const isExpanded = expandedCard === b._id;
+
+                const handleImageClick = (event) => {
+                  if (!isMdUp()) {
+                    event.preventDefault();
+                    setExpandedCard((prev) => (prev === b._id ? null : b._id));
+                    return;
+                  }
+
+                  scrollTo({ top: 0, behavior: 'smooth' });
+                };
+
+                const handleOverlayClick = (event) => {
+                  if (event.target !== event.currentTarget) return;
+
+                  if (isMdUp()) {
+                    goToDetails();
+                  } else {
+                    setExpandedCard(null);
+                  }
+                };
+
                 return (
                   <article
                     key={b._id}
                     className="group relative rounded-xl max-w-[22rem] h-[550px] flex flex-col justify-center w-full overflow-hidden border-2 backdrop-blur border-white hover:border-white/50 hover:shadow-white/30 transition-all duration-500"
+                    aria-expanded={isExpanded}
                   >
                     <Link
                       to={`/books/${b._id}`}
-                      onClick={() => scrollTo({ top: 0, behavior: 'smooth' })}
+                      onClick={handleImageClick}
                       className="block h-full"
                     >
                       <img
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:h-full"
+                        className="h-full w-full object-cover transition-transform duration-500 md:group-hover:scale-105"
                         src={b.coverUrl || '/placeholder.svg'}
                         alt={b.title}
                       />
                     </Link>
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/75 to-slate-950/15 backdrop-blur-xs opacity-0 transition-opacity duration-500 group-hover:opacity-100 pointer-events-none" />
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/75 to-slate-950/15 backdrop-blur-sm opacity-0 transition-opacity duration-500 pointer-events-none ${
+                        isExpanded ? 'opacity-100' : 'md:group-hover:opacity-100'
+                      }`}
+                    />
 
                     <div
-                      className="absolute inset-0 flex flex-col justify-end px-0 pb-5 pt-8 gap-4 translate-y-8 opacity-0 transition-all duration-500 pointer-events-none group-hover:translate-y-0 group-hover:opacity-100 group-hover:pointer-events-auto"
-                      onClick={(event) => {
-                        if (event.target === event.currentTarget) {
-                          goToDetails();
-                        }
-                      }}
+                      className={`absolute inset-0 flex flex-col justify-end min-h-full px-0 pt-10 pb-4 gap-4 translate-y-8 opacity-0 transition-all duration-500 pointer-events-none overflow-y-auto md:overflow-visible md:pt-8 md:pb-5 md:gap-4 md:group-hover:translate-y-0 md:group-hover:opacity-100 md:group-hover:pointer-events-auto ${
+                        isExpanded ? 'translate-y-0 opacity-100 pointer-events-auto' : ''
+                      }`}
+                      onClick={handleOverlayClick}
                     >
-                      <div className="flex flex-col gap-3 w-full bg-slate-950/70 backdrop-blur-md px-4 sm:px-6 py-5 text-white">
+                      <div className="flex flex-col gap-3 w-full bg-slate-950/70 backdrop-blur-md px-4 sm:px-6 py-5 text-white shadow-lg md:shadow-none">
                         <h3 className="text-2xl font-poppins font-bold line-clamp-2">
                           {b.title}
                         </h3>
@@ -276,11 +323,12 @@ export default function Books() {
                         )}
                       </div>
 
-                      <div className="flex justify-between gap-2 px-4 sm:px-6">
+                      <div className="flex justify-between gap-2 px-4 sm:px-6 mb-8 md:mb-0">
                         <Motion.button
                           type="button"
                           onClick={(event) => {
                             event.stopPropagation();
+                            setExpandedCard(null);
                             triggerClick(b._id);
                           }}
                           disabled={addingBookId === b._id}
@@ -321,6 +369,7 @@ export default function Books() {
                           to={`/books/${b._id}`}
                           onClick={(event) => {
                             event.stopPropagation();
+                            setExpandedCard(null);
                             scrollTo({ top: 0, behavior: 'smooth' });
                           }}
                           className="flex rounded-md cursor-pointer justify-center items-center gap-2 border border-white/20 px-6 py-2 text-sm font-poppins text-white/80 hover:text-white bg-slate-900 hover:bg-slate-500 hover:border-white/40 transition"

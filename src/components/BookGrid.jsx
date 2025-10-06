@@ -23,25 +23,13 @@ const BookGrid = () => {
         </header>
 
         {isLoading ? (
-          <>
-            <div className="featured-books-scroll block md:hidden mt-10 overflow-x-auto pb-4 -mx-4 px-4" role="list">
-              <div className="flex gap-4 w-max">
-                {Array.from({ length: 6 }).map((_, i) => (
-                  <div role="listitem" key={i} className="flex-shrink-0 w-[20rem]">
-                    <SkeletonBookCard />
-                  </div>
-                ))}
+          <div className="grid grid-cols-2 mt-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" role="list">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div role="listitem" key={i}>
+                <SkeletonBookCard />
               </div>
-            </div>
-
-            <div className="hidden md:grid mt-10 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" role="list">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div role="listitem" key={i}>
-                  <SkeletonBookCard />
-                </div>
-              ))}
-            </div>
-          </>
+            ))}
+          </div>
         ) : items.length === 0 ? (
           <div className="text-center py-16 text-white/70">No books found.</div>
         ) : (
