@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion as Motion,  } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { addToCart } from '../api/cart.js';
@@ -11,10 +11,11 @@ const BookCard = ({ book }) => {
   const { _id, title, author, price_npr, category, coverUrl } = book;
   const user = useAuth((s) => s.user);
   const qc = useQueryClient();
- const navigate = useNavigate();
- const [clicked, setClicked] = useState(false);
+  const navigate = useNavigate();
+  const [clicked, setClicked] = useState(false);
 
-  
+  const coverImage = coverUrl || '/placeholder.svg';
+  const formattedPrice = Number(price_npr ?? 0).toLocaleString();
 
   const addMut = useMutation({
     mutationFn: () => addToCart(_id, 1),
@@ -38,31 +39,81 @@ const BookCard = ({ book }) => {
     setClicked(true);
     setTimeout(() => setClicked(false), 600);
   };
-  
+
+  const goToDetails = () => {
+    scrollTo({ top: 0, behavior: 'smooth' });
+    navigate(`/books/${_id}`);
+  };
+
   return (
-    <article className="rounded-xl max-w-[22rem]  flex flex-col justify-center w-full overflow-hidden border backdrop-blur border-white hover:border-white/50 shadow-lg hover:shadow-black/30 transition" itemScope itemType="https://schema.org/Book">
-      <Link to={`/books/${_id}`} onClick={() => scrollTo({top: 0, behavior: 'smooth'})} className="block">
-        <img src={coverUrl || '/placeholder.svg'} alt={title} className="h-80 w-full object-fit" />
+    <article
+      className="group relative rounded-xl max-w-[22rem] h-[550px] flex flex-col justify-center w-full overflow-hidden border backdrop-blur border-white hover:border-white/50 shadow-lg hover:shadow-white/30 transition-all duration-500"
+      itemScope
+      itemType="https://schema.org/Book"
+    >
+      <Link
+        to={`/books/${_id}`}
+        onClick={() => scrollTo({ top: 0, behavior: 'smooth' })}
+        className="block h-full"
+      >
+        <img
+          src={coverImage}
+          alt={title}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          itemProp="image"
+        />
       </Link>
-      <div className="p-3 flex flex-col justify-between gap-1">
-        <h3 className="text-2xl mb-1 font-poppins font-bold line-clamp-1" itemProp="name">{title}</h3>
-        <p className="text-md flex gap-2 mb-2 font-medium text-white/70 font-poppins">by <span className=" font-bold text-white"itemProp="author">&quot;{author}&quot;</span></p>
-        {category && <p className="text-md flex gap-2 text-white/70 font-poppins">{category}</p>}
-        <p className="text-brand flex gap-2 mb-5 font-bold mt-1 font-poppins" itemProp="offers" itemScope itemType="https://schema.org/Offer">
-          <span itemProp="priceCurrency" content="NPR">Rs.</span>
-          <span className=" font-inter" itemProp="price">{Number(price_npr ?? 0)}</span>
-        </p>
-        
-        <div className="flex  justify-between gap-2 ">
+
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/75 to-slate-950/15 backdrop-blur-sm opacity-0 transition-opacity duration-500 group-hover:opacity-100 pointer-events-none" />
+
+      <div
+        className="absolute inset-0 flex flex-col justify-end px-0 pb-5 pt-8 gap-4 translate-y-8 opacity-0 transition-all duration-500 pointer-events-none group-hover:translate-y-0 group-hover:opacity-100 group-hover:pointer-events-auto"
+        onClick={(event) => {
+          if (event.target === event.currentTarget) {
+            goToDetails();
+          }
+        }}
+      >
+        <div className="flex flex-col gap-3 w-full bg-slate-950/70 backdrop-blur-md px-4 sm:px-6 py-5 text-white">
+          <h3 className="text-2xl font-poppins font-bold line-clamp-2" itemProp="name">
+            {title}
+          </h3>
+          <p className="text-md flex flex-wrap gap-2 font-medium text-white/70 font-poppins">
+            by
+            <span className="font-bold text-white" itemProp="author">
+              &quot;{author}&quot;
+            </span>
+          </p>
+          {category && (
+            <p className="text-md text-white/70 font-poppins">
+              {category}
+            </p>
+          )}
+          <p
+            className="text-brand flex gap-2 font-bold font-poppins"
+            itemProp="offers"
+            itemScope
+            itemType="https://schema.org/Offer"
+          >
+            <span itemProp="priceCurrency" content="NPR">
+              Rs.
+            </span>
+            <span className="font-inter" itemProp="price">
+              {formattedPrice}
+            </span>
+          </p>
+        </div>
+
+        <div className="flex justify-between gap-2 px-4 sm:px-6">
           <Motion.button
             type="button"
             onClick={handleAddToCart}
             disabled={addMut.isPending}
             aria-busy={addMut.isPending}
-            className="group  rounded overflow-hidden  font-poppins cursor-pointer bg-brand hover:bg-brand-dark text-sm flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="group/add rounded overflow-hidden font-poppins cursor-pointer bg-brand hover:bg-brand-dark text-sm flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <Motion.span
-              className="group flex border bg-slate-900 hover:bg-slate-500 w-[150px] items-center justify-between border-white rounded px-3 py-2 gap-2"
+              className="group/add flex border bg-slate-900 hover:bg-slate-500 w-[150px] items-center justify-between border-white rounded px-3 py-2 gap-2"
               style={{ transformOrigin: 'center' }}
             >
               <Motion.span
@@ -81,12 +132,19 @@ const BookCard = ({ book }) => {
                 {addMut.isPending ? 'Adding…' : 'Add to Cart'}
               </Motion.p>
             </Motion.span>
-
           </Motion.button>
-          <Link to={`/books/${_id}`} onClick={() => scrollTo({top: 0, behavior: 'smooth'})} className="px-9 flex items-center justify-center text-center rounded border bg-slate-900 hover:bg-slate-500  text-sm"> Details</Link>
+
+          <Link
+            to={`/books/${_id}`}
+            onClick={() => scrollTo({ top: 0, behavior: 'smooth' })}
+            className="px-9 flex items-center justify-center text-center rounded border bg-slate-900 hover:bg-slate-500 text-sm"
+          >
+            Details
+          </Link>
         </div>
       </div>
     </article>
   );
 };
+
 export default BookCard;

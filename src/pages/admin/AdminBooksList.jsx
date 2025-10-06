@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchBooks, deleteBook } from '../../api/books.js';
 import { Link } from 'react-router-dom';
-import { Container, Box, Typography, Button, Table, TableHead, TableRow, TableCell, TableBody, IconButton, TableContainer, Chip, Stack } from '@mui/material';
+import { Container, Box, Typography, Button, Table, TableHead, TableRow, TableCell, TableBody, IconButton, TableContainer, Chip, Stack, TablePagination } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -14,25 +14,57 @@ import AdminTableSkeleton from '../../components/skeletons/AdminTableSkeleton.js
 const HeadCell = styled(TableCell)(({ theme }) => ({
   textTransform: 'uppercase',
   letterSpacing: '0.08em',
-  fontSize: theme.typography.pxToRem(12),
+  fontSize: theme.typography.pxToRem(14),
   fontWeight: 900,
   color: 'black',
   borderBottom: `1px solid black`,
   background: theme.palette.mode === 'dark'
     ? 'linear-gradient(135deg, rgba(15,23,42,0.8), rgba(15,23,42,0.6))'
     : 'linear-gradient(135deg, rgba(226,232,240,0.7), rgba(241,245,249,0.9))',
+  padding: theme.spacing(2, 3),
+  [theme.breakpoints.down('sm')]: {
+    fontSize: theme.typography.pxToRem(12),
+    padding: theme.spacing(1.5, 2),
+  },
 }));
 
 const BodyCell = styled(TableCell)(({ theme }) => ({
   borderBottom: `1px solid ${theme.palette.mode === 'dark' ? 'rgba(148, 163, 184, 0.15)' : 'rgba(148, 163, 184, 0.25)'}`,
   color: 'white',
-  fontSize: theme.typography.pxToRem(14),
+  fontSize: theme.typography.pxToRem(15),
+  padding: theme.spacing(2),
+  [theme.breakpoints.down('sm')]: {
+    fontSize: theme.typography.pxToRem(13),
+    padding: theme.spacing(1.5),
+  },
 }));
 
 export default function AdminBooksList() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({ queryKey: ['books', { admin: true }], queryFn: () => fetchBooks({ limit: 100 }) });
-  const items = data?.items || [];
+  const items = React.useMemo(() => data?.items ?? [], [data]);
+  const [search, setSearch] = React.useState('');
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+  const filteredItems = React.useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return items;
+    return items.filter((item) => {
+      const title = item.title?.toLowerCase() ?? '';
+      const author = item.author?.toLowerCase() ?? '';
+      return title.includes(query) || author.includes(query);
+    });
+  }, [items, search]);
+
+  const paginatedItems = React.useMemo(() => {
+    const start = page * rowsPerPage;
+    return filteredItems.slice(start, start + rowsPerPage);
+  }, [filteredItems, page, rowsPerPage]);
+
+  React.useEffect(() => {
+    setPage(0);
+  }, [search, rowsPerPage, filteredItems.length]);
 
   const delMut = useMutation({
     mutationFn: async (id) => {
@@ -67,22 +99,40 @@ export default function AdminBooksList() {
     <Container sx={{ py: 4 }}>
       <Background />
       <div className="relative z-10">
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="h4">Manage Books</Typography>
-        <Button variant="contained" component={Link} to="/admin/books/new">Add Book</Button>
+      <Box className="flex flex-col md:flex-row gap-3 md:items-center justify-between mb-4">
+        <Typography variant="h4" className="text-white">Manage Books</Typography>
+        <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+          <div className="flex-1 relative z-10">
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search books..."
+              className="max-w-[30rem] w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:bg-slate-900 dark:border-slate-700 dark:text-white dark:placeholder-slate-400 dark:focus:ring-slate-600"
+            />
+          </div>
+          <Button variant="contained" component={Link} to="/admin/books/new" className="self-start sm:self-center">
+            Add Book
+          </Button>
+        </div>
       </Box>
 
       <TableContainer
         sx={{
           borderRadius: 3,
           overflow: 'hidden',
+          overflowX: 'auto',
           border: '1px solid rgba(148, 163, 184, 0.25)',
           background: 'linear-gradient(135deg, rgba(15,23,42,0.85), rgba(30,41,59,0.65))',
           backdropFilter: 'blur(18px)',
           boxShadow: '0 18px 36px -18px rgba(15,23,42,0.65)',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none',
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
         }}
       >
-        <Table size="small">
+        <Table size="small" sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow>
               <HeadCell>Title</HeadCell>
@@ -95,8 +145,8 @@ export default function AdminBooksList() {
           <TableBody>
             {isLoading ? (
               <AdminTableSkeleton rows={8} />
-            ) : items.length ? (
-              items.map((b) => (
+            ) : filteredItems.length ? (
+              paginatedItems.map((b) => (
                 <TableRow
                   key={b._id}
                   hover
@@ -120,7 +170,18 @@ export default function AdminBooksList() {
                       variant="outlined"
                     />
                   </BodyCell>
-                  <BodyCell align="right">
+                  <BodyCell
+                    align="center"
+                    sx={{
+                      minWidth: { xs: 140, sm: 160 },
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      gap: 1.5,
+                      flexWrap: { xs: 'wrap', sm: 'nowrap' },
+                      textAlign: 'center',
+                    }}
+                  >
                     <IconButton component={Link} to={`/admin/books/${b._id}/edit`} color="primary" size="small">
                       <EditIcon fontSize="small" />
                     </IconButton>
@@ -155,6 +216,53 @@ export default function AdminBooksList() {
           </TableBody>
         </Table>
       </TableContainer>
+      {filteredItems.length > 0 && (
+        <Box
+          sx={{
+            mt: 3,
+            borderRadius: 3,
+            overflow: 'hidden',
+            background: 'linear-gradient(135deg, rgba(15,23,42,0.9), rgba(30,41,59,0.75))',
+            border: '1px solid rgba(148, 163, 184, 0.25)',
+            boxShadow: '0 12px 24px -16px rgba(15,23,42,0.75)',
+            mx: 'auto',
+            width: { xs: '100%', md: 'fit-content' },
+            maxWidth: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <TablePagination
+            component="div"
+            count={filteredItems.length}
+            page={page}
+            onPageChange={(_event, newPage) => setPage(newPage)}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={(event) => {
+              setRowsPerPage(parseInt(event.target.value, 10));
+              setPage(0);
+            }}
+            rowsPerPageOptions={[5, 10, 25, 50]}
+            sx={{
+              color: 'white',
+              width: '100%',
+              '.MuiTablePagination-toolbar': {
+                flexWrap: 'wrap',
+                px: { xs: 2, sm: 3 },
+                py: { xs: 1, sm: 1.5 },
+                gap: { xs: 1, sm: 0 },
+              },
+              '.MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows': {
+                fontSize: { xs: '0.75rem', sm: '0.85rem' },
+              },
+              '.MuiTablePagination-actions': {
+                display: 'flex',
+                alignItems: 'center',
+              },
+            }}
+          />
+        </Box>
+      )}
       </div>
     </Container>
   );
