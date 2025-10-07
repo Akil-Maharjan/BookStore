@@ -239,7 +239,7 @@ export default function Books() {
         </div>
       </div>
 
-      <div className="grid place-self-center sm:place-self-auto mb-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 relative z-10">
+      <div className="grid place-self-center sm:place-self-auto mb-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-y-8 gap-x-4 relative z-10">
         {isLoading || isFetching
           ? Array.from({ length: 12 }).map((_, idx) => <SkeletonBookCard key={idx} />)
           : filteredItems.length > 0
@@ -272,7 +272,7 @@ export default function Books() {
                 return (
                   <article
                     key={b._id}
-                    className="group relative rounded-xl max-w-[22rem] h-[550px] flex flex-col justify-center w-full overflow-hidden border-2 backdrop-blur border-white hover:border-white/50 hover:shadow-white/30 transition-all duration-500"
+                    className="group relative rounded-xl max-w-[22rem] h-[550px] flex flex-col justify-center w-full overflow-hidden border  hover:shadow-white/30 transition-all duration-500 hover:scale-[1.05] hover:shadow-lg"
                     aria-expanded={isExpanded}
                   >
                     <Link
@@ -281,7 +281,7 @@ export default function Books() {
                       className="block h-full"
                     >
                       <img
-                        className="h-full w-full object-cover transition-transform duration-500 lg:group-hover:scale-105"
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.05]"
                         src={b.coverUrl || '/placeholder.svg'}
                         alt={b.title}
                       />
@@ -289,7 +289,7 @@ export default function Books() {
 
                     <div
                       className={`absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/75 to-slate-950/15 backdrop-blur-sm transition-opacity duration-500 pointer-events-none ${
-                        isExpanded ? 'opacity-100' : 'opacity-0 lg:group-hover:opacity-100'
+                        isExpanded ? 'opacity-100' : 'opacity-0 lg:group-hover:opacity-90'
                       }`}
                     />
 

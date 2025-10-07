@@ -116,7 +116,7 @@ const BookCard = ({ book }) => {
 
   return (
     <article
-      className="group relative rounded-xl max-w-[22rem] h-[550px] flex flex-col justify-center w-full overflow-hidden border backdrop-blur border-white hover:border-white/50 shadow-lg hover:shadow-white/30 transition-all duration-500"
+      className="group relative rounded-xl max-w-[22rem] h-[550px] flex flex-col justify-center w-full overflow-hidden border backdrop-blur border-slate-500 shadow-lg hover:shadow-white/30 transition-all duration-500"
       itemScope
       itemType="https://schema.org/Book"
       aria-expanded={isExpanded}
@@ -124,19 +124,19 @@ const BookCard = ({ book }) => {
       <Link
         to={`/books/${_id}`}
         onClick={handleImageClick}
-        className="block h-full"
+        className="block h-full "
       >
         <img
           src={coverImage}
           alt={title}
-          className="h-full w-full object-cover transition-transform duration-500 lg:group-hover:scale-105"
+          className="h-full w-full object-cover  transition-transform duration-500 group-hover:scale-[1.05] group-hover:shadow-2xl"
           itemProp="image"
         />
       </Link>
 
       <div
         className={`absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/75 to-slate-950/15 backdrop-blur-sm transition-opacity duration-500 pointer-events-none ${
-          isExpanded ? 'opacity-100' : 'opacity-0 lg:group-hover:opacity-100'
+          isExpanded ? 'opacity-100' : 'opacity-0 lg:group-hover:opacity-90'
         }`}
       />
 

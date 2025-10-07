@@ -29,6 +29,7 @@ import Background from '../../components/Background.jsx';
 import { getAllOrders } from '../../api/orders.js';
 import { fetchBooks } from '../../api/books.js';
 
+
 const fonts = {
   heading: '"Poppins", "Inter", sans-serif',
   body: '"Inter", "Host Grotesk", sans-serif',
@@ -425,6 +426,7 @@ export default function AdminDashboard() {
   ];
 
   return (
+    
     <Container
       component={motion.div}
       initial={{ opacity: 0, y: 12 }}
@@ -433,8 +435,10 @@ export default function AdminDashboard() {
       sx={{ py: { xs: 4, md: 6 }, px: { xs: 1.5, sm: 2 } }}
       maxWidth="xl"
     >
+
       <Background />
       <div className="relative z-10">
+       
         <Stack spacing={4}>
           <Paper sx={{ ...surfaceSx, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
             <Typography

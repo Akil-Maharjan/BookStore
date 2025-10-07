@@ -18,7 +18,7 @@ const BookGrid = () => {
       <div className="max-w-[1550px] mx-auto px-4">
         
         <header className="mb-4 relative z-10" >
-          <h2 id="books-heading" className="text-3xl font-poppins text-center sm:text-4xl md:text-6xl lg:text-[67px] font-extrabold host-grotesk mb-4">Featured Books</h2>
+          <h2 id="books-heading" className="text-3xl font-poppins text-center sm:text-4xl md:text-6xl lg:text-[67px]  font-extrabold host-grotesk mb-4">Featured Books</h2>
           <p className="text-center text-xl">Explore our selection of popular titles.</p>
         </header>
 
@@ -44,9 +44,9 @@ const BookGrid = () => {
               </div>
             </div>
 
-            <div className="hidden ml-6 md:grid mt-10 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" role="list">
+            <div className="hidden ml-6 md:grid mt-10 grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-y-8 gap-x-4" role="list">
               {items.map((book) => (
-                <div role="listitem" key={book._id}>
+                <div role="listitem" key={book._id} className="transition-transform duration-300 hover:scale-[1.05] hover:shadow-xl">
                   <BookCard book={book} />  
                 </div>
               ))}

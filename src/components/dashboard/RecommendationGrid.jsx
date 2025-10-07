@@ -2,6 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Chip, Divider, Paper, Skeleton, Stack, Typography } from '@mui/material';
 
+
+
+
 const cardSx = {
   position: 'relative',
   display: 'flex',
@@ -51,6 +54,7 @@ function RecommendationCard({ book, fonts, isAdminView, formatCurrency }) {
           style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
         />
       </Box>
+      
       <Stack spacing={1} alignItems="flex-start">
         <Chip
           label={book.category || (isAdminView ? 'Inventory' : 'Featured')}

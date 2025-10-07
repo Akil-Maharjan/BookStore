@@ -1,5 +1,6 @@
 import React from 'react';
 import RevealOnScroll from '../components/RevealOnScroll.jsx';
+import Bookshelf from '../components/Bookshelf.jsx';
 
 export default function About({ sectionId = 'about', disableId = false, className = '' }) {
   const id = disableId ? undefined : sectionId;
@@ -7,7 +8,7 @@ export default function About({ sectionId = 'about', disableId = false, classNam
   return (
     <section
       id={id}
-      className={`relative py-20 md:py-30 scroll-mt-40 flex ${className}`}
+      className={`relative py-20 md:py-30 scroll-mt-40 flex  ${className}`}
     >
       {/* Background image (same as hero) */}
 
@@ -25,6 +26,7 @@ export default function About({ sectionId = 'about', disableId = false, classNam
                 className="w-90 sm:w-120 md:w-[50rem] lg:w-[50rem]  md:h-[470px] xl:h-[460px] 2xl:h-[450px] lg:h-[430px]  xl:w-[56rem] 2xl:w-full max-w-full h-auto object-contain"
                 loading="lazy"
               />
+              
             </RevealOnScroll>
             {/* Text right */}
             <RevealOnScroll direction="left" delay={0.1} className="flex-1 w-full md:max-w-3xl lg:max-w-2xl text-center">

@@ -245,7 +245,7 @@ const Navbar = () => {
     `${active === key ? "text-black" : "text-slate-600 dark:text-white"} group-hover:text-black`;
 
   return (
-    <header className="sticky top-0 z-50 shadow-[0_8px_20px_-8px_rgba(15,23,42,0.55),0_2px_6px_rgba(15,23,42,0.18)] border-b border-white/40 dark:border-slate-800 text-slate-800 backdrop-blur bg-white/85 dark:bg-slate-900/25 dark:text-slate-100">
+    <header className="sticky shadow-slate-700/30 top-0 z-50 shadow-[0_8px_20px_-8px_rgba(15,23,42,0.55),0_2px_6px_rgba(15,23,42,0.18)] border-b border-white/40 dark:border-slate-800 text-slate-800 backdrop-blur bg-white/85 dark:bg-slate-900/25 dark:text-slate-100">
       <nav className="max-w-[96rem] mx-auto px-4">
         <div className="flex items-center justify-between h-20 ">
           {/* Left: Brand */}
