@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
-import { useAuth } from '../store/auth.js';
-import { me } from '../api/auth.js';
+import { useEffect } from "react";
+import { useAuth } from "../store/auth.js";
+import { me } from "../api/auth.js";
 
 export default function AuthBootstrap() {
   const setAuth = useAuth((s) => s.setAuth);

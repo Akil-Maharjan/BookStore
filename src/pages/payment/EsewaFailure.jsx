@@ -1,13 +1,21 @@
-import React from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Container, Typography, Paper, Stack, Alert, Button } from '@mui/material';
-import Background from '../../components/Background.jsx';
+import React from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Container,
+  Typography,
+  Paper,
+  Stack,
+  Alert,
+  Button,
+} from "@mui/material";
+import Background from "../../components/Background.jsx";
 
 export default function EsewaFailure() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const orderId = searchParams.get('orderId') || searchParams.get('oid') || '';
-  const message = searchParams.get('message') || 'The payment was not completed.';
+  const orderId = searchParams.get("orderId") || searchParams.get("oid") || "";
+  const message =
+    searchParams.get("message") || "The payment was not completed.";
 
   return (
     <Container sx={{ py: 4 }}>
@@ -22,19 +30,20 @@ export default function EsewaFailure() {
               {message}
               {orderId && (
                 <>
-                  {' '}
+                  {" "}
                   (Order reference: <strong>{orderId}</strong>)
                 </>
               )}
             </Alert>
             <Typography variant="body2" color="text.secondary">
-              If this was unexpected, you may try the payment again or choose a different payment method.
+              If this was unexpected, you may try the payment again or choose a
+              different payment method.
             </Typography>
             <Stack direction="row" spacing={2}>
-              <Button variant="contained" onClick={() => navigate('/checkout')}>
+              <Button variant="contained" onClick={() => navigate("/checkout")}>
                 Retry Payment
               </Button>
-              <Button variant="outlined" onClick={() => navigate('/cart')}>
+              <Button variant="outlined" onClick={() => navigate("/cart")}>
                 Return to Cart
               </Button>
             </Stack>

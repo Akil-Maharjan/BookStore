@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 export default function SkeletonBookDetail() {
   return (
@@ -24,7 +24,10 @@ export default function SkeletonBookDetail() {
       <div className="my-6 h-px bg-white/10" />
       <div className="space-y-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="rounded border border-white/10 bg-white/5 p-3">
+          <div
+            key={i}
+            className="rounded border border-white/10 bg-white/5 p-3"
+          >
             <div className="h-4 bg-white/10 rounded w-32 mb-2" />
             <div className="h-4 bg-white/10 rounded w-24 mb-2" />
             <div className="h-6 bg-white/10 rounded w-full" />

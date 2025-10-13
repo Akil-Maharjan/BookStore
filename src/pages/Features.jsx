@@ -1,15 +1,44 @@
-import React from 'react';
-import { QrCode, Gift, BarChart3, Database, TrendingUp, Bell } from 'lucide-react';
-import RevealOnScroll from '../components/RevealOnScroll.jsx';
+import React from "react";
+import {
+  QrCode,
+  Gift,
+  BarChart3,
+  Database,
+  TrendingUp,
+  Bell,
+} from "lucide-react";
+import RevealOnScroll from "../components/RevealOnScroll.jsx";
 
-export default function Features({ sectionId = 'features', disableId = false, className = '' }) {
+export default function Features({
+  sectionId = "features",
+  disableId = false,
+  className = "",
+}) {
   const items = [
-    { title: 'Beautiful UI', desc: 'Clean, modern, and responsive design inspired by top product shots.' },
-    { title: 'Fast Search', desc: 'Find books by title, author, or category with server-side filters.' },
-    { title: 'Reviews & Ratings', desc: 'Read and write reviews to help others find great reads.' },
-    { title: 'Secure Auth', desc: 'Protected routes, role-based access, and secure cookies.' },
-    { title: 'Cart & Orders', desc: 'Add to cart, adjust quantities, and place orders seamlessly.' },
-    { title: 'Local Payments', desc: 'Khalti/eSewa verification for a smooth checkout experience.' },
+    {
+      title: "Beautiful UI",
+      desc: "Clean, modern, and responsive design inspired by top product shots.",
+    },
+    {
+      title: "Fast Search",
+      desc: "Find books by title, author, or category with server-side filters.",
+    },
+    {
+      title: "Reviews & Ratings",
+      desc: "Read and write reviews to help others find great reads.",
+    },
+    {
+      title: "Secure Auth",
+      desc: "Protected routes, role-based access, and secure cookies.",
+    },
+    {
+      title: "Cart & Orders",
+      desc: "Add to cart, adjust quantities, and place orders seamlessly.",
+    },
+    {
+      title: "Local Payments",
+      desc: "Khalti/eSewa verification for a smooth checkout experience.",
+    },
   ];
   const icons = [QrCode, Gift, BarChart3, Database, TrendingUp, Bell];
   const id = disableId ? undefined : sectionId;
@@ -21,7 +50,10 @@ export default function Features({ sectionId = 'features', disableId = false, cl
     >
       <div className="max-w-[1910px] mx-auto">
         {/* Section Header */}
-        <RevealOnScroll direction="up" className="text-center relative z-10  lg:mb-9 mb-6">
+        <RevealOnScroll
+          direction="up"
+          className="text-center relative z-10  lg:mb-9 mb-6"
+        >
           <h2 className="text-3xl font-poppins sm:text-4xl md:text-6xl lg:text-[67px] font-extrabold host-grotesk mb-4 sm:mb-6 lg:mb-8">
             Powerful Features
           </h2>
@@ -33,62 +65,72 @@ export default function Features({ sectionId = 'features', disableId = false, cl
         {/* Large Screens: Horizontal scrolling rows */}
         <div className="hidden lg:block">
           {/* First Row */}
-          <RevealOnScroll direction="up" delay={0.05} className="mb-1 overflow-hidden">
+          <RevealOnScroll
+            direction="up"
+            delay={0.05}
+            className="mb-1 overflow-hidden"
+          >
             <div className="flex gap-5 scroll-left">
               {[...items, ...items].map((feature, index) => {
                 const Icon = icons[index % icons.length];
                 return (
-                <div
-                  key={`row1-${index}`}
-                  className="relative flex-shrink-0 max-w-[450px] h-[350px] rounded-xl overflow-hidden border backdrop-blur bg-black/30 p-8 text-white"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
-                  <div className="relative z-10">
-                    <div className="flex items-center justify-between gap-10 mb-9">
-                      <div className="w-40 h-40 p-5 bg-white/20 border border-white/30 rounded-[32px] flex items-center justify-center">
-                        <Icon className="w-28 h-28 text-white" />
+                  <div
+                    key={`row1-${index}`}
+                    className="relative flex-shrink-0 max-w-[450px] h-[350px] rounded-xl overflow-hidden border backdrop-blur bg-black/30 p-8 text-white"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between gap-10 mb-9">
+                        <div className="w-40 h-40 p-5 bg-white/20 border border-white/30 rounded-[32px] flex items-center justify-center">
+                          <Icon className="w-28 h-28 text-white" />
+                        </div>
+                        <h3 className="text-2xl md:text-[30px] font-extrabold host-grotesk leading-tight">
+                          {feature.title}
+                        </h3>
                       </div>
-                      <h3 className="text-2xl md:text-[30px] font-extrabold host-grotesk leading-tight">
-                        {feature.title}
-                      </h3>
+                      <p className="text-base md:text-[20px] font-semibold host-grotesk text-center text-white/90">
+                        {feature.desc}
+                      </p>
                     </div>
-                    <p className="text-base md:text-[20px] font-semibold host-grotesk text-center text-white/90">
-                      {feature.desc}
-                    </p>
                   </div>
-                </div>
                 );
               })}
             </div>
           </RevealOnScroll>
 
           {/* Second Row */}
-          <RevealOnScroll direction="up" delay={0.1} className="lg:mb-8 overflow-hidden">
+          <RevealOnScroll
+            direction="up"
+            delay={0.1}
+            className="lg:mb-8 overflow-hidden"
+          >
             <div className="flex gap-5 scroll-left-second">
-              {[...items.slice(3), ...items.slice(0, 3), ...items.slice(3)].map((feature, index) => {
-                const Icon = icons[(index + 3) % icons.length];
-                return (
-                <div
-                  key={`row2-${index}`}
-                  className="relative flex-shrink-0 max-w-[450px] h-[350px] rounded-xl overflow-hidden border backdrop-blur bg-black/30 p-8 text-white"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
-                  <div className="relative z-10">
-                    <div className="flex items-center gap-9 mb-9">
-                      <div className="w-40 h-40 p-5 bg-white/20 border border-white/30 rounded-[32px] flex items-center justify-center">
-                        <Icon className="w-28 h-28 text-white" />
+              {[...items.slice(3), ...items.slice(0, 3), ...items.slice(3)].map(
+                (feature, index) => {
+                  const Icon = icons[(index + 3) % icons.length];
+                  return (
+                    <div
+                      key={`row2-${index}`}
+                      className="relative flex-shrink-0 max-w-[450px] h-[350px] rounded-xl overflow-hidden border backdrop-blur bg-black/30 p-8 text-white"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
+                      <div className="relative z-10">
+                        <div className="flex items-center gap-9 mb-9">
+                          <div className="w-40 h-40 p-5 bg-white/20 border border-white/30 rounded-[32px] flex items-center justify-center">
+                            <Icon className="w-28 h-28 text-white" />
+                          </div>
+                          <h3 className="text-2xl md:text-[30px] font-extrabold host-grotesk leading-tight">
+                            {feature.title}
+                          </h3>
+                        </div>
+                        <p className="text-base md:text-[20px] font-semibold host-grotesk text-center text-white/90">
+                          {feature.desc}
+                        </p>
                       </div>
-                      <h3 className="text-2xl md:text-[30px] font-extrabold host-grotesk leading-tight">
-                        {feature.title}
-                      </h3>
                     </div>
-                    <p className="text-base md:text-[20px] font-semibold host-grotesk text-center text-white/90">
-                      {feature.desc}
-                    </p>
-                  </div>
-                </div>
-                );
-              })}
+                  );
+                }
+              )}
             </div>
           </RevealOnScroll>
         </div>
@@ -113,7 +155,9 @@ export default function Features({ sectionId = 'features', disableId = false, cl
                         {feature.title}
                       </h3>
                     </div>
-                    <p className="text-sm font-semibold host-grotesk text-white/90">{feature.desc}</p>
+                    <p className="text-sm font-semibold host-grotesk text-white/90">
+                      {feature.desc}
+                    </p>
                   </div>
                 </div>
               );
@@ -127,7 +171,10 @@ export default function Features({ sectionId = 'features', disableId = false, cl
             {items.map((feature, index) => {
               const Icon = icons[index % icons.length];
               return (
-                <div key={`sm-${index}`} className="relative rounded-xl overflow-hidden border backdrop-blur bg-black/30 p-5 text-white">
+                <div
+                  key={`sm-${index}`}
+                  className="relative rounded-xl overflow-hidden border backdrop-blur bg-black/30 p-5 text-white"
+                >
                   <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent" />
                   <div className="relative z-10">
                     <div className="flex items-center gap-4 mb-4">
@@ -138,7 +185,9 @@ export default function Features({ sectionId = 'features', disableId = false, cl
                         {feature.title}
                       </h3>
                     </div>
-                    <p className="text-sm font-semibold host-grotesk text-white/90">{feature.desc}</p>
+                    <p className="text-sm font-semibold host-grotesk text-white/90">
+                      {feature.desc}
+                    </p>
                   </div>
                 </div>
               );

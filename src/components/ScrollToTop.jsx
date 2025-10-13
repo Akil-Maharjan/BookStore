@@ -1,11 +1,11 @@
-import { useLayoutEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLayoutEffect } from "react";
+import { useLocation } from "react-router-dom";
 
-export default function ScrollToTop({ behavior = 'auto' }) {
+export default function ScrollToTop({ behavior = "auto" }) {
   const { pathname, search, hash } = useLocation();
 
   useLayoutEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
     if (window.__skipNextScrollTop) {
       delete window.__skipNextScrollTop;
@@ -13,14 +13,13 @@ export default function ScrollToTop({ behavior = 'auto' }) {
     }
 
     try {
-      window.history.scrollRestoration = 'manual';
+      window.history.scrollRestoration = "manual";
     } catch {
       /* ignore unsupported browsers */
     }
 
-    const scrollOptions = behavior === 'auto'
-      ? { top: 0, left: 0 }
-      : { top: 0, left: 0, behavior };
+    const scrollOptions =
+      behavior === "auto" ? { top: 0, left: 0 } : { top: 0, left: 0, behavior };
 
     // Use rAF to wait for layout, then force scroll for both html & body
     requestAnimationFrame(() => {

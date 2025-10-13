@@ -1,14 +1,14 @@
-import { toast } from 'react-hot-toast';
-import React from 'react';
+import { toast } from "react-hot-toast";
+import React from "react";
 
 /**
  * Show a centered toast-based confirm dialog.
  * Resolves to true if confirmed, false if cancelled/dismissed.
  */
 export function confirmToast({
-  message = 'Are you sure?',
-  confirmText = 'Yes',
-  cancelText = 'No',
+  message = "Are you sure?",
+  confirmText = "Yes",
+  cancelText = "No",
 } = {}) {
   return new Promise((resolve) => {
     const finalize = (result) => {
@@ -52,8 +52,8 @@ export function confirmToast({
       ),
       {
         duration: Infinity,
-        position: 'top-center',
-      },
+        position: "top-center",
+      }
     );
   });
 }

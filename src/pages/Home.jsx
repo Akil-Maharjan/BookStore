@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { QrCode, Gift, BarChart3, Database, TrendingUp, Bell, ShoppingBag } from 'lucide-react';
+import {  ShoppingBag } from 'lucide-react';
 import BookGrid from '../components/BookGrid.jsx';
 import Features from './Features.jsx';
 import About from './About.jsx';

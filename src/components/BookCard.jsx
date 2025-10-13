@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { motion as Motion } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { addToCart } from '../api/cart.js';
-import toast from 'react-hot-toast';
-import { ShoppingCart } from 'lucide-react';
-import { useAuth } from '../store/auth.js';
+import React, { useEffect, useMemo, useState } from "react";
+import { motion as Motion } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addToCart } from "../api/cart.js";
+import toast from "react-hot-toast";
+import { ShoppingCart } from "lucide-react";
+import { useAuth } from "../store/auth.js";
 
 const BookCard = ({ book }) => {
   const { _id, title, author, price_npr, category, coverUrl } = book;
@@ -16,25 +16,25 @@ const BookCard = ({ book }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const cardId = useMemo(() => `book-card-${_id}`, [_id]);
 
-  const coverImage = coverUrl || '/placeholder.svg';
+  const coverImage = coverUrl || "/placeholder.svg";
   const formattedPrice = Number(price_npr ?? 0).toLocaleString();
 
   const addMut = useMutation({
     mutationFn: () => addToCart(_id, 1),
     onSuccess: () => {
-      toast.success('Added to cart', { duration: 2000 });
-      qc.invalidateQueries({ queryKey: ['cart'] });
+      toast.success("Added to cart", { duration: 2000 });
+      qc.invalidateQueries({ queryKey: ["cart"] });
     },
     onError: (err) =>
-      toast.error(err?.response?.data?.message || 'Failed to add to cart'),
+      toast.error(err?.response?.data?.message || "Failed to add to cart"),
   });
 
   const handleAddToCart = () => {
     if (addMut.isPending) return;
 
     if (!user) {
-      navigate('/login');
-      scrollTo({ top: 0, behavior: 'smooth' });
+      navigate("/login");
+      scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
@@ -45,8 +45,8 @@ const BookCard = ({ book }) => {
 
   // ✅ Now hover behavior only for screens >= 1025px (desktop)
   const isLgUp = () =>
-    typeof window !== 'undefined' &&
-    window.matchMedia('(min-width: 1025px)').matches;
+    typeof window !== "undefined" &&
+    window.matchMedia("(min-width: 1025px)").matches;
 
   useEffect(() => {
     const handleResize = () => {
@@ -56,19 +56,19 @@ const BookCard = ({ book }) => {
     };
 
     handleResize();
-    if (typeof window !== 'undefined') {
-      window.addEventListener('resize', handleResize);
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", handleResize);
     }
 
     return () => {
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('resize', handleResize);
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", handleResize);
       }
     };
   }, []);
 
   const goToDetails = () => {
-    scrollTo({ top: 0, behavior: 'smooth' });
+    scrollTo({ top: 0, behavior: "smooth" });
     navigate(`/books/${_id}`);
   };
 
@@ -79,7 +79,7 @@ const BookCard = ({ book }) => {
         const next = !prev;
         if (next) {
           window.dispatchEvent(
-            new CustomEvent('book-card-expanded', { detail: cardId })
+            new CustomEvent("book-card-expanded", { detail: cardId })
           );
         }
         return next;
@@ -87,7 +87,7 @@ const BookCard = ({ book }) => {
       return;
     }
 
-    scrollTo({ top: 0, behavior: 'smooth' });
+    scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleOverlayClick = (event) => {
@@ -101,7 +101,7 @@ const BookCard = ({ book }) => {
   };
 
   useEffect(() => {
-    if (typeof window === 'undefined') return undefined;
+    if (typeof window === "undefined") return undefined;
 
     const handleExternalExpand = (event) => {
       if (event.detail !== cardId) {
@@ -109,9 +109,9 @@ const BookCard = ({ book }) => {
       }
     };
 
-    window.addEventListener('book-card-expanded', handleExternalExpand);
+    window.addEventListener("book-card-expanded", handleExternalExpand);
     return () =>
-      window.removeEventListener('book-card-expanded', handleExternalExpand);
+      window.removeEventListener("book-card-expanded", handleExternalExpand);
   }, [cardId]);
 
   return (
@@ -136,15 +136,15 @@ const BookCard = ({ book }) => {
 
       <div
         className={`absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/75 to-slate-950/15 backdrop-blur-sm transition-opacity duration-500 pointer-events-none ${
-          isExpanded ? 'opacity-100' : 'opacity-0 lg:group-hover:opacity-90'
+          isExpanded ? "opacity-100" : "opacity-0 lg:group-hover:opacity-90"
         }`}
       />
 
       <div
         className={`absolute inset-0 flex flex-col justify-end min-h-full px-0 pt-10 pb-4 gap-4 transition-all duration-500 overflow-y-auto lg:overflow-visible lg:pt-8 lg:pb-5 ${
           isExpanded
-            ? 'pointer-events-auto translate-y-0 opacity-100'
-            : 'pointer-events-none translate-y-8 opacity-0 lg:pointer-events-none lg:group-hover:pointer-events-auto lg:group-hover:translate-y-0 lg:group-hover:opacity-100'
+            ? "pointer-events-auto translate-y-0 opacity-100"
+            : "pointer-events-none translate-y-8 opacity-0 lg:pointer-events-none lg:group-hover:pointer-events-auto lg:group-hover:translate-y-0 lg:group-hover:opacity-100"
         }`}
         onClick={handleOverlayClick}
       >
@@ -197,28 +197,28 @@ const BookCard = ({ book }) => {
               disabled={addMut.isPending}
               aria-busy={addMut.isPending}
               className="group relative rounded cursor-pointer overflow-hidden font-poppins bg-transparent text-sm flex items-center disabled:opacity-60 disabled:cursor-not-allowed w-full"
-              style={{ WebkitTapHighlightColor: 'transparent' }}
+              style={{ WebkitTapHighlightColor: "transparent" }}
             >
               <Motion.span
                 className="flex border bg-slate-900 hover:bg-slate-500 w-full items-center justify-between border-white/50 rounded px-3 py-2 gap-2"
-                style={{ transformOrigin: 'center' }}
+                style={{ transformOrigin: "center" }}
               >
                 <Motion.span
                   animate={
                     clicked ? { x: 150, rotate: -30 } : { x: 0, rotate: 0 }
                   }
-                  transition={{ duration: 0.5, ease: 'easeInOut' }}
+                  transition={{ duration: 0.5, ease: "easeInOut" }}
                   className="shrink-0"
                 >
                   <ShoppingCart className="w-5 h-5" />
                 </Motion.span>
                 <Motion.p
                   animate={clicked ? { opacity: 0 } : { opacity: 1 }}
-                  transition={{ duration: 0.3, ease: 'easeInOut' }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
                   className="flex-1 font-poppins truncate text-center"
                   title="Add to Cart"
                 >
-                  {addMut.isPending ? 'Adding…' : 'Add to Cart'}
+                  {addMut.isPending ? "Adding…" : "Add to Cart"}
                 </Motion.p>
               </Motion.span>
             </Motion.button>
@@ -228,7 +228,7 @@ const BookCard = ({ book }) => {
             to={`/books/${_id}`}
             onClick={(event) => {
               event.stopPropagation();
-              scrollTo({ top: 0, behavior: 'smooth' });
+              scrollTo({ top: 0, behavior: "smooth" });
             }}
             onPointerDown={(event) => event.stopPropagation()}
             className="px-9 flex items-center justify-center text-center rounded border bg-slate-900 hover:bg-slate-500 text-sm"

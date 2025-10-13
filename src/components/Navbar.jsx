@@ -3,13 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../store/auth.js";
 import { logout as logoutApi } from "../api/auth.js";
 import toast from "react-hot-toast";
-import {
-  Home as HomeIcon,
-  Info,
-  Sparkles,
-  BookOpen,
-  Mail,
-} from "lucide-react";
+import { Info, Sparkles, BookOpen, Mail } from "lucide-react";
 import logo from "../assets/logo.png";
 
 const Navbar = () => {
@@ -38,7 +32,11 @@ const Navbar = () => {
   );
 
   const sectionKeyMap = React.useMemo(
-    () => Object.fromEntries([["main", ""], ...sectionOrder.map(({ id, key }) => [id, key])]),
+    () =>
+      Object.fromEntries([
+        ["main", ""],
+        ...sectionOrder.map(({ id, key }) => [id, key]),
+      ]),
     [sectionOrder]
   );
 
@@ -242,7 +240,9 @@ const Navbar = () => {
   const activeCls = " text-black dark:text-black dark:bg-slate-200";
   const makeCls = (key) => baseLink + (active === key ? activeCls : "");
   const iconClass = (key) =>
-    `${active === key ? "text-black" : "text-slate-600 dark:text-white"} group-hover:text-black`;
+    `${
+      active === key ? "text-black" : "text-slate-600 dark:text-white"
+    } group-hover:text-black`;
 
   return (
     <header className="sticky shadow-slate-700/30 top-0 z-50 shadow-[0_8px_20px_-8px_rgba(15,23,42,0.55),0_2px_6px_rgba(15,23,42,0.18)] border-b border-white/40 dark:border-slate-800 text-slate-800 backdrop-blur bg-white/85 dark:bg-slate-900/25 dark:text-slate-100">
@@ -257,40 +257,48 @@ const Navbar = () => {
               scrollToId("main", { suppressActive: true });
             }}
           >
-            <img src={logo} alt="" className="w-25 h-25"/>
+            <img src={logo} alt="" className="w-25 h-25" />
           </Link>
 
           {/* Center nav links (desktop & md) */}
           <div className="hidden md:flex items-center gap-4">
-            
             <Link
               to="/books"
               onClick={() => {
                 setOpen(false);
                 scrollTop();
               }}
-              className={makeCls("books") + " hover:text-black dark:hover:bg-slate-200"}
+              className={
+                makeCls("books") + " hover:text-black dark:hover:bg-slate-200"
+              }
             >
               <BookOpen size={18} className={iconClass("books")} />
               Books
             </Link>
             <button
               onClick={() => scrollToId("about")}
-              className={makeCls("about") + " hover:text-black dark:hover:bg-slate-200"}
+              className={
+                makeCls("about") + " hover:text-black dark:hover:bg-slate-200"
+              }
             >
               <Info size={18} className={iconClass("about")} />
               About
             </button>
             <button
               onClick={() => scrollToId("features")}
-              className={makeCls("features") + " hover:text-black dark:hover:bg-slate-200"}
+              className={
+                makeCls("features") +
+                " hover:text-black dark:hover:bg-slate-200"
+              }
             >
               <Sparkles size={18} className={iconClass("features")} />
               Features
             </button>
             <button
               onClick={() => scrollToId("contact")}
-              className={makeCls("contact") + " hover:text-black dark:hover:bg-slate-200"}
+              className={
+                makeCls("contact") + " hover:text-black dark:hover:bg-slate-200"
+              }
             >
               <Mail size={18} className={iconClass("contact")} />
               Contact
@@ -340,7 +348,7 @@ const Navbar = () => {
                 to="/login"
                 onClick={() => {
                   setOpen(false);
-                  scrollTo({ top: 0, behavior: 'smooth' });
+                  scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 className="px-3  py-2 cursor-pointer rounded border hover:text-black dark:hover:bg-slate-200"
               >
@@ -370,7 +378,7 @@ const Navbar = () => {
                     <button
                       onClick={() => {
                         doLogout();
-                        scrollTo({ top: 0, behavior: 'smooth' });
+                        scrollTo({ top: 0, behavior: "smooth" });
                       }}
                       className="block w-full text-left px-3 py-2 rounded hover:bg-slate-100 dark:hover:bg-slate-800"
                     >
@@ -400,28 +408,40 @@ const Navbar = () => {
                 setOpen(false);
                 scrollTop();
               }}
-              className={makeCls("books") + " hover:bg-white hover:text-black dark:hover:bg-white"}
+              className={
+                makeCls("books") +
+                " hover:bg-white hover:text-black dark:hover:bg-white"
+              }
             >
               <BookOpen size={18} className={iconClass("books")} />
               Books
             </Link>
             <button
               onClick={() => scrollToId("about")}
-              className={makeCls("about") + " hover:bg-white hover:text-black dark:hover:bg-white"}
+              className={
+                makeCls("about") +
+                " hover:bg-white hover:text-black dark:hover:bg-white"
+              }
             >
               <Info size={18} className={iconClass("about")} />
               About
             </button>
             <button
               onClick={() => scrollToId("features")}
-              className={makeCls("features") + " hover:bg-white hover:text-black dark:hover:bg-white"}
+              className={
+                makeCls("features") +
+                " hover:bg-white hover:text-black dark:hover:bg-white"
+              }
             >
               <Sparkles size={18} className={iconClass("features")} />
               Features
             </button>
             <button
               onClick={() => scrollToId("contact")}
-              className={makeCls("contact") + " hover:bg-white hover:text-black dark:hover:bg-white"}
+              className={
+                makeCls("contact") +
+                " hover:bg-white hover:text-black dark:hover:bg-white"
+              }
             >
               <Mail size={18} className={iconClass("contact")} />
               Contact
@@ -433,7 +453,10 @@ const Navbar = () => {
                   setOpen(false);
                   scrollTop();
                 }}
-                className={makeCls("dashboard") + " hover:bg-white hover:text-black dark:hover:bg-white"}
+                className={
+                  makeCls("dashboard") +
+                  " hover:bg-white hover:text-black dark:hover:bg-white"
+                }
               >
                 Dashboard
               </Link>
@@ -446,7 +469,10 @@ const Navbar = () => {
                     setOpen(false);
                     scrollTop();
                   }}
-                  className={makeCls("dashboard") + " hover:bg-white hover:text-black dark:hover:bg-white"}
+                  className={
+                    makeCls("dashboard") +
+                    " hover:bg-white hover:text-black dark:hover:bg-white"
+                  }
                 >
                   Manage Books
                 </Link>
@@ -456,7 +482,10 @@ const Navbar = () => {
                     setOpen(false);
                     scrollTop();
                   }}
-                  className={makeCls("dashboard") + " hover:bg-white hover:text-black dark:hover:bg-white"}
+                  className={
+                    makeCls("dashboard") +
+                    " hover:bg-white hover:text-black dark:hover:bg-white"
+                  }
                 >
                   📦 Orders
                 </Link>
@@ -469,7 +498,10 @@ const Navbar = () => {
                   setOpen(false);
                   scrollTop();
                 }}
-                className={makeCls("cart") + " hover:bg-white hover:text-black dark:hover:bg-white"}
+                className={
+                  makeCls("cart") +
+                  " hover:bg-white hover:text-black dark:hover:bg-white"
+                }
               >
                 🛒 Cart
               </Link>
@@ -481,7 +513,10 @@ const Navbar = () => {
                   setOpen(false);
                   scrollTop();
                 }}
-                className={makeCls("cart") + " hover:bg-white hover:text-black dark:hover:bg-white"}
+                className={
+                  makeCls("cart") +
+                  " hover:bg-white hover:text-black dark:hover:bg-white"
+                }
               >
                 🛒 Cart
               </Link>
@@ -501,7 +536,7 @@ const Navbar = () => {
               <button
                 onClick={() => {
                   doLogout();
-                  scrollTo({ top: 0, behavior: 'smooth' });
+                  scrollTo({ top: 0, behavior: "smooth" });
                 }}
                 className="px-3 py-2 rounded border border-slate-200 dark:border-slate-600 hover:bg-white hover:text-black dark:hover:bg-white w-fit"
               >
@@ -516,4 +551,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

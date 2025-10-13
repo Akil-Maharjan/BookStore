@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Container,
   Paper,
@@ -25,98 +25,116 @@ import {
   Skeleton,
   Tooltip,
   Avatar,
-} from '@mui/material';
-import dayjs from 'dayjs';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { getAllOrders, updateOrderStatus, deleteOrder, setOrderReview } from '../../api/orders.js';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import Background from '../../components/Background.jsx';
-import { confirmToast } from '../../utils/confirmToast.jsx';
-import toast from 'react-hot-toast';
-import OrderDetailDialog from '../../components/OrderDetailDialog.jsx';
-import AdminTableSkeleton from '../../components/skeletons/AdminTableSkeleton.jsx';
+} from "@mui/material";
+import dayjs from "dayjs";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import {
+  getAllOrders,
+  updateOrderStatus,
+  deleteOrder,
+  setOrderReview,
+} from "../../api/orders.js";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import Background from "../../components/Background.jsx";
+import { confirmToast } from "../../utils/confirmToast.jsx";
+import toast from "react-hot-toast";
+import OrderDetailDialog from "../../components/OrderDetailDialog.jsx";
+import AdminTableSkeleton from "../../components/skeletons/AdminTableSkeleton.jsx";
 
 const palette = {
-  primaryText: 'rgba(226,232,255,0.92)',
-  secondaryText: 'rgba(148,163,209,0.75)',
-  headerText: 'rgba(226,232,255,0.88)',
-  dangerText: '#fca5a5',
+  primaryText: "rgba(226,232,255,0.92)",
+  secondaryText: "rgba(148,163,209,0.75)",
+  headerText: "rgba(226,232,255,0.88)",
+  dangerText: "#fca5a5",
 };
 
 const statusChipStyles = (status) => {
   switch (status) {
-    case 'pending':
-    case 'processing':
-    case 'shipping':
+    case "pending":
+    case "processing":
+    case "shipping":
       return {
-        color: '#ffffff',
-        bgcolor: 'rgba(255,255,255,0.12)',
-        border: '1px solid rgba(255,255,255,0.35)',
+        color: "#ffffff",
+        bgcolor: "rgba(255,255,255,0.12)",
+        border: "1px solid rgba(255,255,255,0.35)",
       };
-    case 'paid':
-    case 'completed':
-    case 'shipped':
+    case "paid":
+    case "completed":
+    case "shipped":
       return {
-        color: '#bbf7d0',
-        bgcolor: 'rgba(34,197,94,0.12)',
-        border: '1px solid rgba(74,222,128,0.28)',
+        color: "#bbf7d0",
+        bgcolor: "rgba(34,197,94,0.12)",
+        border: "1px solid rgba(74,222,128,0.28)",
       };
-    case 'failed':
-    case 'cancelled':
+    case "failed":
+    case "cancelled":
       return {
-        color: '#fecaca',
-        bgcolor: 'rgba(248,113,113,0.12)',
-        border: '1px solid rgba(248,113,113,0.28)',
+        color: "#fecaca",
+        bgcolor: "rgba(248,113,113,0.12)",
+        border: "1px solid rgba(248,113,113,0.28)",
       };
     default:
       return {
         color: palette.primaryText,
-        bgcolor: 'rgba(255,255,255,0.08)',
-        border: '1px solid rgba(255,255,255,0.16)',
+        bgcolor: "rgba(255,255,255,0.08)",
+        border: "1px solid rgba(255,255,255,0.16)",
       };
   }
 };
 
 const statusColor = (status) => {
   switch (status) {
-    case 'paid':
-      return 'success';
-    case 'processing':
-    case 'shipping':
-      return 'info';
-    case 'shipped':
-    case 'completed':
-      return 'primary';
-    case 'failed':
-    case 'cancelled':
-      return 'error';
+    case "paid":
+      return "success";
+    case "processing":
+    case "shipping":
+      return "info";
+    case "shipped":
+    case "completed":
+      return "primary";
+    case "failed":
+    case "cancelled":
+      return "error";
     default:
-      return 'default';
+      return "default";
   }
 };
 
 const formatCurrency = (value) => `Rs. ${Number(value || 0).toLocaleString()}`;
 
-const adminStatusOptions = ['pending', 'processing', 'shipping', 'shipped', 'completed', 'cancelled', 'failed'];
+const adminStatusOptions = [
+  "pending",
+  "processing",
+  "shipping",
+  "shipped",
+  "completed",
+  "cancelled",
+  "failed",
+];
 
 const statusLabel = {
-  pending: 'Pending payment',
-  processing: 'Processing order',
-  shipping: 'Shipping in progress',
-  shipped: 'Shipped',
-  completed: 'Completed',
-  cancelled: 'Cancelled',
-  failed: 'Failed',
+  pending: "Pending payment",
+  processing: "Processing order",
+  shipping: "Shipping in progress",
+  shipped: "Shipped",
+  completed: "Completed",
+  cancelled: "Cancelled",
+  failed: "Failed",
 };
 
 export default function AdminOrders() {
   const qc = useQueryClient();
-  const { data: orders = [], isLoading, isError, error } = useQuery({
-    queryKey: ['orders', { scope: 'admin' }],
+  const {
+    data: orders = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["orders", { scope: "admin" }],
     queryFn: () => getAllOrders(),
   });
 
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [menuAnchor, setMenuAnchor] = useState(null);
   const [activeOrder, setActiveOrder] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
@@ -127,39 +145,46 @@ export default function AdminOrders() {
   const statusMut = useMutation({
     mutationFn: ({ id, status }) => updateOrderStatus(id, status),
     onSuccess: () => {
-      toast.success('Order status updated');
-      qc.invalidateQueries({ queryKey: ['orders', { scope: 'admin' }] });
-      qc.invalidateQueries({ queryKey: ['orders', { scope: 'mine' }] });
+      toast.success("Order status updated");
+      qc.invalidateQueries({ queryKey: ["orders", { scope: "admin" }] });
+      qc.invalidateQueries({ queryKey: ["orders", { scope: "mine" }] });
     },
-    onError: (err) => toast.error(err?.response?.data?.message || 'Failed to update order'),
+    onError: (err) =>
+      toast.error(err?.response?.data?.message || "Failed to update order"),
   });
 
   const reviewMut = useMutation({
     mutationFn: ({ id, isReviewed }) => setOrderReview(id, isReviewed),
     onSuccess: () => {
-      toast.success('Review status updated');
-      qc.invalidateQueries({ queryKey: ['orders', { scope: 'admin' }] });
-      qc.invalidateQueries({ queryKey: ['orders', { scope: 'mine' }] });
+      toast.success("Review status updated");
+      qc.invalidateQueries({ queryKey: ["orders", { scope: "admin" }] });
+      qc.invalidateQueries({ queryKey: ["orders", { scope: "mine" }] });
     },
-    onError: (err) => toast.error(err?.response?.data?.message || 'Failed to update review status'),
+    onError: (err) =>
+      toast.error(
+        err?.response?.data?.message || "Failed to update review status"
+      ),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id) => deleteOrder(id),
     onSuccess: () => {
-      toast.success('Order deleted');
-      qc.invalidateQueries({ queryKey: ['orders', { scope: 'admin' }] });
-      qc.invalidateQueries({ queryKey: ['orders', { scope: 'mine' }] });
+      toast.success("Order deleted");
+      qc.invalidateQueries({ queryKey: ["orders", { scope: "admin" }] });
+      qc.invalidateQueries({ queryKey: ["orders", { scope: "mine" }] });
     },
-    onError: (err) => toast.error(err?.response?.data?.message || 'Failed to delete order'),
+    onError: (err) =>
+      toast.error(err?.response?.data?.message || "Failed to delete order"),
   });
 
   const filteredOrders = useMemo(() => {
     if (!search.trim()) return orders;
     const needle = search.trim().toLowerCase();
     return orders.filter((order) => {
-      const customer = `${order.user?.name || ''} ${order.user?.email || ''}`.toLowerCase();
-      const orderId = order._id?.toLowerCase() ?? '';
+      const customer = `${order.user?.name || ""} ${
+        order.user?.email || ""
+      }`.toLowerCase();
+      const orderId = order._id?.toLowerCase() ?? "";
       return customer.includes(needle) || orderId.includes(needle);
     });
   }, [orders, search]);
@@ -191,14 +216,14 @@ export default function AdminOrders() {
     let startX = 0;
     let scrollLeft = 0;
 
-    const isDesktop = () => window.matchMedia('(min-width: 900px)').matches;
+    const isDesktop = () => window.matchMedia("(min-width: 900px)").matches;
 
     const handlePointerDown = (event) => {
       if (isDesktop()) return;
       isDragging = true;
       startX = event.clientX;
       scrollLeft = el.scrollLeft;
-      el.style.cursor = 'grabbing';
+      el.style.cursor = "grabbing";
       el.setPointerCapture?.(event.pointerId);
     };
 
@@ -211,20 +236,20 @@ export default function AdminOrders() {
     const endDrag = (event) => {
       if (!isDragging) return;
       isDragging = false;
-      el.style.cursor = '';
+      el.style.cursor = "";
       el.releasePointerCapture?.(event.pointerId);
     };
 
-    el.addEventListener('pointerdown', handlePointerDown);
-    el.addEventListener('pointermove', handlePointerMove);
-    el.addEventListener('pointerup', endDrag);
-    el.addEventListener('pointerleave', endDrag);
+    el.addEventListener("pointerdown", handlePointerDown);
+    el.addEventListener("pointermove", handlePointerMove);
+    el.addEventListener("pointerup", endDrag);
+    el.addEventListener("pointerleave", endDrag);
 
     return () => {
-      el.removeEventListener('pointerdown', handlePointerDown);
-      el.removeEventListener('pointermove', handlePointerMove);
-      el.removeEventListener('pointerup', endDrag);
-      el.removeEventListener('pointerleave', endDrag);
+      el.removeEventListener("pointerdown", handlePointerDown);
+      el.removeEventListener("pointermove", handlePointerMove);
+      el.removeEventListener("pointerup", endDrag);
+      el.removeEventListener("pointerleave", endDrag);
     };
   }, []);
 
@@ -245,30 +270,30 @@ export default function AdminOrders() {
   const handleDeleteOrder = async () => {
     if (!activeOrder) return;
     handleCloseMenu();
-    const ok = await confirmToast({ message: 'Delete this order?', confirmText: 'Delete' });
+    const ok = await confirmToast({
+      message: "Delete this order?",
+      confirmText: "Delete",
+    });
     if (ok) deleteMut.mutate(activeOrder._id);
   };
 
   const tableSkeletonColumns = useMemo(
     () => [
-      { width: '18%' },
-      { width: '18%' },
-      { width: '20%' },
-      { width: '18%' },
-      { width: '14%' },
-      { width: '12%' },
-      { width: '10%', align: 'right' },
+      { width: "18%" },
+      { width: "18%" },
+      { width: "20%" },
+      { width: "18%" },
+      { width: "14%" },
+      { width: "12%" },
+      { width: "10%", align: "right" },
     ],
     []
   );
 
   return (
-    <div className='max-w-[96rem] py-10 w-full mx-auto'>
+    <div className="max-w-[96rem] py-10 w-full mx-auto">
       <Background />
-      <Box
-        className=" relative z-10"
-        
-      >
+      <Box className=" relative z-10">
         <Typography
           variant="h3"
           gutterBottom
@@ -280,13 +305,24 @@ export default function AdminOrders() {
         </Typography>
         {isLoading && (
           <Stack spacing={1} sx={{ maxWidth: 360, my: 1 }}>
-            <Skeleton variant="text" animation="wave" height={28} sx={{ bgcolor: 'rgba(148,163,184,0.18)' }} />
-            <Skeleton variant="text" animation="wave" height={20} width="80%" sx={{ bgcolor: 'rgba(148,163,184,0.18)' }} />
+            <Skeleton
+              variant="text"
+              animation="wave"
+              height={28}
+              sx={{ bgcolor: "rgba(148,163,184,0.18)" }}
+            />
+            <Skeleton
+              variant="text"
+              animation="wave"
+              height={20}
+              width="80%"
+              sx={{ bgcolor: "rgba(148,163,184,0.18)" }}
+            />
           </Stack>
         )}
         {isError && (
           <Typography variant="body1" sx={{ color: palette.dangerText }}>
-            {error?.response?.data?.message || 'Failed to load orders'}
+            {error?.response?.data?.message || "Failed to load orders"}
           </Typography>
         )}
         {!isLoading && !orders.length && (
@@ -297,19 +333,19 @@ export default function AdminOrders() {
         {orders.length > 0 && (
           <Paper
             sx={{
-              bgcolor: '#0f172a',
-              color: 'white',
+              bgcolor: "#0f172a",
+              color: "white",
               borderRadius: 3,
-              border: '1px solid rgba(255,255,255,0.08)',
-              overflow: 'hidden',
-              fontFamily: 'Poppins, sans-serif',
+              border: "1px solid rgba(255,255,255,0.08)",
+              overflow: "hidden",
+              fontFamily: "Poppins, sans-serif",
               py: 4,
-              boxShadow: '0 18px 40px rgba(15,23,42,0.45)',
+              boxShadow: "0 18px 40px rgba(15,23,42,0.45)",
               px: { xs: 2, md: 3 },
-              '& .MuiToolbar-root': {
-                borderBottom: '1px solid rgba(255,255,255,0.08)',
-                display: 'flex',
-                flexWrap: 'wrap',
+              "& .MuiToolbar-root": {
+                borderBottom: "1px solid rgba(255,255,255,0.08)",
+                display: "flex",
+                flexWrap: "wrap",
                 gap: 2,
                 px: 0,
                 py: { xs: 1.5, md: 2 },
@@ -318,10 +354,17 @@ export default function AdminOrders() {
           >
             <Toolbar>
               <Box>
-                <Typography variant="h6" fontWeight={600} sx={{ color: palette.primaryText }}>
+                <Typography
+                  variant="h6"
+                  fontWeight={600}
+                  sx={{ color: palette.primaryText }}
+                >
                   All Orders
                 </Typography>
-                <Typography variant="body2" sx={{ color: palette.secondaryText }}>
+                <Typography
+                  variant="body2"
+                  sx={{ color: palette.secondaryText }}
+                >
                   Your most recent orders list
                 </Typography>
               </Box>
@@ -333,15 +376,17 @@ export default function AdminOrders() {
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by customer or order ID"
                 sx={{
-                  minWidth: { xs: '100%', sm: 260 },
-                  bgcolor: 'rgba(15,23,42,0.9)',
-                  '& .MuiOutlinedInput-root': {
-                    color: 'white',
-                    '& fieldset': { borderColor: 'rgba(255,255,255,0.14)' },
-                    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.4)' },
+                  minWidth: { xs: "100%", sm: 260 },
+                  bgcolor: "rgba(15,23,42,0.9)",
+                  "& .MuiOutlinedInput-root": {
+                    color: "white",
+                    "& fieldset": { borderColor: "rgba(255,255,255,0.14)" },
+                    "&:hover fieldset": {
+                      borderColor: "rgba(255,255,255,0.4)",
+                    },
                   },
-                  '& .MuiInputBase-input::placeholder': {
-                    color: 'rgba(255,255,255,0.5)',
+                  "& .MuiInputBase-input::placeholder": {
+                    color: "rgba(255,255,255,0.5)",
                     opacity: 1,
                   },
                 }}
@@ -351,28 +396,28 @@ export default function AdminOrders() {
               ref={tableScrollRef}
               className="hide-scroll-sm"
               sx={{
-                overflowX: 'auto',
-                WebkitOverflowScrolling: 'touch',
-                cursor: { xs: 'grab', md: 'default' },
+                overflowX: "auto",
+                WebkitOverflowScrolling: "touch",
+                cursor: { xs: "grab", md: "default" },
               }}
             >
               <Table
                 size="medium"
                 sx={{
                   minWidth: 960,
-                  '& th': {
+                  "& th": {
                     py: 2,
                     px: 3,
                     color: palette.headerText,
                     fontWeight: 600,
-                    letterSpacing: '0.015em',
-                    borderBottom: '1px solid rgba(255,255,255,0.1)',
+                    letterSpacing: "0.015em",
+                    borderBottom: "1px solid rgba(255,255,255,0.1)",
                   },
-                  '& td': {
+                  "& td": {
                     py: 2.4,
                     px: 3,
-                    verticalAlign: 'top',
-                    borderBottom: '1px solid rgba(255,255,255,0.06)',
+                    verticalAlign: "top",
+                    borderBottom: "1px solid rgba(255,255,255,0.06)",
                   },
                 }}
               >
@@ -384,106 +429,172 @@ export default function AdminOrders() {
                     <TableCell>Totals</TableCell>
                     <TableCell>Status</TableCell>
                     <TableCell>Placed</TableCell>
-                    <TableCell align="right">
-                      Actions
-                    </TableCell>
+                    <TableCell align="right">Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {isLoading ? (
-                    <AdminTableSkeleton rows={6} columns={tableSkeletonColumns} />
+                    <AdminTableSkeleton
+                      rows={6}
+                      columns={tableSkeletonColumns}
+                    />
                   ) : displayedOrders.length ? (
                     displayedOrders.map((order) => {
-                      const totalItems = order.items?.reduce((sum, item) => sum + (item.quantity || 0), 0) || 0;
+                      const totalItems =
+                        order.items?.reduce(
+                          (sum, item) => sum + (item.quantity || 0),
+                          0
+                        ) || 0;
                       return (
                         <TableRow
                           key={order._id}
                           hover
                           sx={{
-                            '&:hover': { bgcolor: 'rgba(255,255,255,0.04)' },
+                            "&:hover": { bgcolor: "rgba(255,255,255,0.04)" },
                           }}
                         >
                           <TableCell>
-                            <Typography variant="subtitle2" fontWeight={600} sx={{ color: '#ffffff' }}>
+                            <Typography
+                              variant="subtitle2"
+                              fontWeight={600}
+                              sx={{ color: "#ffffff" }}
+                            >
                               #{order._id?.slice(-6) || order._id}
                             </Typography>
-                            <Typography variant="body2" sx={{ color: palette.secondaryText }}>
-                              Payment: {order.payment?.method?.toUpperCase() || '—'}
+                            <Typography
+                              variant="body2"
+                              sx={{ color: palette.secondaryText }}
+                            >
+                              Payment:{" "}
+                              {order.payment?.method?.toUpperCase() || "—"}
                             </Typography>
                           </TableCell>
                           <TableCell>
-                            <Typography variant="body2" fontWeight={500} sx={{ color: '#ffffff' }}>
-                              {order.user?.name || 'Unknown user'}
+                            <Typography
+                              variant="body2"
+                              fontWeight={500}
+                              sx={{ color: "#ffffff" }}
+                            >
+                              {order.user?.name || "Unknown user"}
                             </Typography>
-                            <Typography variant="body2" sx={{ color: palette.secondaryText }}>
-                              {order.user?.email || '—'}
+                            <Typography
+                              variant="body2"
+                              sx={{ color: palette.secondaryText }}
+                            >
+                              {order.user?.email || "—"}
                             </Typography>
                           </TableCell>
                           <TableCell>
-                            <Stack direction="row" spacing={2} alignItems="center">
+                            <Stack
+                              direction="row"
+                              spacing={2}
+                              alignItems="center"
+                            >
                               <Avatar
                                 variant="rounded"
                                 src={order.items?.[0]?.book?.coverUrl}
-                                alt={order.items?.[0]?.book?.title || order.items?.[0]?.title}
+                                alt={
+                                  order.items?.[0]?.book?.title ||
+                                  order.items?.[0]?.title
+                                }
                                 sx={{
                                   width: 56,
                                   height: 80,
                                   borderRadius: 1.5,
-                                  bgcolor: 'rgba(15,23,42,0.4)',
-                                  border: '1px solid rgba(255,255,255,0.12)',
+                                  bgcolor: "rgba(15,23,42,0.4)",
+                                  border: "1px solid rgba(255,255,255,0.12)",
                                   fontSize: 24,
                                 }}
                               >
-                                {order.items?.[0]?.book?.title?.[0]?.toUpperCase() || order.items?.[0]?.title?.[0]?.toUpperCase() || '📘'}
+                                {order.items?.[0]?.book?.title?.[0]?.toUpperCase() ||
+                                  order.items?.[0]?.title?.[0]?.toUpperCase() ||
+                                  "📘"}
                               </Avatar>
                               <Box>
                                 <Typography
                                   variant="body2"
-                                  sx={{ color: '#ffffff' }}
+                                  sx={{ color: "#ffffff" }}
                                   noWrap
-                                  title={order.items?.[0]?.book?.title || order.items?.[0]?.title}
+                                  title={
+                                    order.items?.[0]?.book?.title ||
+                                    order.items?.[0]?.title
+                                  }
                                 >
-                                  {order.items?.[0]?.book?.title || order.items?.[0]?.title || '—'}
-                                  {totalItems > 1 ? ' +' + (totalItems - 1) : ''}
+                                  {order.items?.[0]?.book?.title ||
+                                    order.items?.[0]?.title ||
+                                    "—"}
+                                  {totalItems > 1
+                                    ? " +" + (totalItems - 1)
+                                    : ""}
                                 </Typography>
-                                <Typography variant="body2" fontWeight={500} sx={{ color: palette.secondaryText }}>
-                                  {totalItems} item{totalItems === 1 ? '' : 's'}
+                                <Typography
+                                  variant="body2"
+                                  fontWeight={500}
+                                  sx={{ color: palette.secondaryText }}
+                                >
+                                  {totalItems} item{totalItems === 1 ? "" : "s"}
                                 </Typography>
                               </Box>
                             </Stack>
                           </TableCell>
                           <TableCell>
-                            <Typography variant="subtitle1" fontWeight={600} sx={{ color: '#ffffff' }}>
+                            <Typography
+                              variant="subtitle1"
+                              fontWeight={600}
+                              sx={{ color: "#ffffff" }}
+                            >
                               {formatCurrency(order.total)}
                             </Typography>
-                            <Typography variant="body2" sx={{ color: palette.secondaryText }}>
+                            <Typography
+                              variant="body2"
+                              sx={{ color: palette.secondaryText }}
+                            >
                               Subtotal: {formatCurrency(order.subtotal)}
                             </Typography>
                           </TableCell>
                           <TableCell>
-                            <Stack direction="row" spacing={1.5} alignItems="center">
+                            <Stack
+                              direction="row"
+                              spacing={1.5}
+                              alignItems="center"
+                            >
                               <Chip
                                 label={order.status}
                                 size="small"
                                 variant="outlined"
                                 sx={{
-                                  textTransform: 'capitalize',
+                                  textTransform: "capitalize",
                                   fontWeight: 600,
-                                  letterSpacing: '0.01em',
+                                  letterSpacing: "0.01em",
                                   px: 0.5,
                                   ...statusChipStyles(order.status),
                                 }}
                               />
-                              <Tooltip title={order.isReviewed ? 'Order reviewed' : 'Mark as reviewed'}>
+                              <Tooltip
+                                title={
+                                  order.isReviewed
+                                    ? "Order reviewed"
+                                    : "Mark as reviewed"
+                                }
+                              >
                                 <span>
                                   <IconButton
                                     size="small"
-                                    onClick={() => reviewMut.mutate({ id: order._id, isReviewed: !order.isReviewed })}
+                                    onClick={() =>
+                                      reviewMut.mutate({
+                                        id: order._id,
+                                        isReviewed: !order.isReviewed,
+                                      })
+                                    }
                                     disabled={reviewMut.isPending}
                                     sx={{
-                                      color: order.isReviewed ? '#bbf7d0' : 'rgba(255,255,255,0.6)',
-                                      '&:hover': {
-                                        color: order.isReviewed ? '#a5f3fc' : '#facc15',
+                                      color: order.isReviewed
+                                        ? "#bbf7d0"
+                                        : "rgba(255,255,255,0.6)",
+                                      "&:hover": {
+                                        color: order.isReviewed
+                                          ? "#a5f3fc"
+                                          : "#facc15",
                                       },
                                     }}
                                   >
@@ -491,25 +602,56 @@ export default function AdminOrders() {
                                   </IconButton>
                                 </span>
                               </Tooltip>
-                              <FormControl size="small" sx={{ minWidth: 160, '& .MuiInputBase-root': { color: '#ffffff' } }}>
-                                <InputLabel sx={{ color: 'rgba(226,232,255,0.7)' }}>Status</InputLabel>
+                              <FormControl
+                                size="small"
+                                sx={{
+                                  minWidth: 160,
+                                  "& .MuiInputBase-root": { color: "#ffffff" },
+                                }}
+                              >
+                                <InputLabel
+                                  sx={{ color: "rgba(226,232,255,0.7)" }}
+                                >
+                                  Status
+                                </InputLabel>
                                 <Select
                                   label="Status"
                                   value={order.status}
-                                  disabled={order.isReviewed ? false : ['shipping', 'shipped', 'completed'].includes(order.status)}
-                                  onChange={(e) => statusMut.mutate({ id: order._id, status: e.target.value })}
+                                  disabled={
+                                    order.isReviewed
+                                      ? false
+                                      : [
+                                          "shipping",
+                                          "shipped",
+                                          "completed",
+                                        ].includes(order.status)
+                                  }
+                                  onChange={(e) =>
+                                    statusMut.mutate({
+                                      id: order._id,
+                                      status: e.target.value,
+                                    })
+                                  }
                                   sx={{
-                                    color: '#ffffff',
-                                    '& .MuiSvgIcon-root': { color: '#ffffff' },
+                                    color: "#ffffff",
+                                    "& .MuiSvgIcon-root": { color: "#ffffff" },
                                   }}
                                 >
                                   {adminStatusOptions.map((status) => {
                                     const disableForReview =
                                       !order.isReviewed &&
-                                      ['shipping', 'shipped', 'completed'].includes(status) &&
+                                      [
+                                        "shipping",
+                                        "shipped",
+                                        "completed",
+                                      ].includes(status) &&
                                       status !== order.status;
                                     return (
-                                      <MenuItem key={status} value={status} disabled={disableForReview}>
+                                      <MenuItem
+                                        key={status}
+                                        value={status}
+                                        disabled={disableForReview}
+                                      >
                                         {statusLabel[status] || status}
                                       </MenuItem>
                                     );
@@ -519,11 +661,17 @@ export default function AdminOrders() {
                             </Stack>
                           </TableCell>
                           <TableCell>
-                            <Typography variant="body2" sx={{ color: palette.primaryText }}>
-                              {dayjs(order.createdAt).format('MMM D, YYYY')}
+                            <Typography
+                              variant="body2"
+                              sx={{ color: palette.primaryText }}
+                            >
+                              {dayjs(order.createdAt).format("MMM D, YYYY")}
                             </Typography>
-                            <Typography variant="caption" sx={{ color: palette.secondaryText }}>
-                              {dayjs(order.createdAt).format('h:mm A')}
+                            <Typography
+                              variant="caption"
+                              sx={{ color: palette.secondaryText }}
+                            >
+                              {dayjs(order.createdAt).format("h:mm A")}
                             </Typography>
                           </TableCell>
                           <TableCell align="right">
@@ -531,12 +679,12 @@ export default function AdminOrders() {
                               size="small"
                               onClick={(event) => handleOpenMenu(event, order)}
                               sx={{
-                                color: '#ffffff',
+                                color: "#ffffff",
                                 borderRadius: 2,
-                                transition: 'all 0.2s ease',
-                                '&:hover': {
-                                  color: '#c7d2fe',
-                                  bgcolor: 'rgba(255,255,255,0.08)',
+                                transition: "all 0.2s ease",
+                                "&:hover": {
+                                  color: "#c7d2fe",
+                                  bgcolor: "rgba(255,255,255,0.08)",
                                 },
                               }}
                             >
@@ -550,10 +698,16 @@ export default function AdminOrders() {
                     <TableRow>
                       <TableCell colSpan={7}>
                         <Stack alignItems="center" py={8} spacing={1}>
-                          <Typography variant="body1" color={palette.secondaryText}>
+                          <Typography
+                            variant="body1"
+                            color={palette.secondaryText}
+                          >
                             No orders found.
                           </Typography>
-                          <Typography variant="body2" color="rgba(255,255,255,0.5)">
+                          <Typography
+                            variant="body2"
+                            color="rgba(255,255,255,0.5)"
+                          >
                             New orders will appear here.
                           </Typography>
                         </Stack>
@@ -572,13 +726,13 @@ export default function AdminOrders() {
               rowsPerPageOptions={[rowsPerPage]}
               onRowsPerPageChange={() => {}}
               sx={{
-                color: 'white',
+                color: "white",
                 px: 2,
-                '& .MuiTablePagination-actions .MuiIconButton-root': {
-                  color: '#ffffff',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.08)',
+                "& .MuiTablePagination-actions .MuiIconButton-root": {
+                  color: "#ffffff",
+                  cursor: "pointer",
+                  "&:hover": {
+                    bgcolor: "rgba(255,255,255,0.08)",
                   },
                 },
               }}
@@ -591,18 +745,22 @@ export default function AdminOrders() {
           onClose={handleCloseMenu}
           PaperProps={{
             sx: {
-              bgcolor: '#10182b',
-              color: 'white',
+              bgcolor: "#10182b",
+              color: "white",
               borderRadius: 2,
-              border: '1px solid rgba(255,255,255,0.08)',
+              border: "1px solid rgba(255,255,255,0.08)",
               minWidth: 180,
-              fontFamily: 'Poppins, sans-serif',
+              fontFamily: "Poppins, sans-serif",
             },
           }}
         >
           <MenuItem onClick={handleViewDetails}>View details</MenuItem>
-          <Divider sx={{ borderColor: 'rgba(255,255,255,0.08)' }} />
-          <MenuItem onClick={handleDeleteOrder} disabled={deleteMut.isPending} sx={{ color: '#f87171' }}>
+          <Divider sx={{ borderColor: "rgba(255,255,255,0.08)" }} />
+          <MenuItem
+            onClick={handleDeleteOrder}
+            disabled={deleteMut.isPending}
+            sx={{ color: "#f87171" }}
+          >
             Delete order
           </MenuItem>
         </Menu>
@@ -614,6 +772,6 @@ export default function AdminOrders() {
           statusColorGetter={statusColor}
         />
       </Box>
-   </div>
+    </div>
   );
 }

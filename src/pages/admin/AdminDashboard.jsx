@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo } from "react";
 import {
   Container,
   Grid,
@@ -10,10 +10,10 @@ import {
   Box,
   Skeleton,
   Button,
-} from '@mui/material';
-import { motion } from 'framer-motion';
-import { useQuery } from '@tanstack/react-query';
-import dayjs from 'dayjs';
+} from "@mui/material";
+import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import dayjs from "dayjs";
 import {
   TrendingUp,
   Package,
@@ -23,12 +23,11 @@ import {
   AlertCircle,
   ShoppingBag,
   ArrowUpRight,
-} from 'lucide-react';
+} from "lucide-react";
 
-import Background from '../../components/Background.jsx';
-import { getAllOrders } from '../../api/orders.js';
-import { fetchBooks } from '../../api/books.js';
-
+import Background from "../../components/Background.jsx";
+import { getAllOrders } from "../../api/orders.js";
+import { fetchBooks } from "../../api/books.js";
 
 const fonts = {
   heading: '"Poppins", "Inter", sans-serif',
@@ -39,45 +38,82 @@ const fonts = {
 const surfaceSx = {
   p: { xs: 2, md: 3 },
   borderRadius: 3,
-  background: 'linear-gradient(165deg, rgba(15,23,42,0.92), rgba(15,23,42,0.78))',
-  border: '1px solid rgba(148,163,184,0.18)',
-  color: '#e2e8f0',
-  boxShadow: '0 24px 48px -32px rgba(15,23,42,0.95)',
-  backdropFilter: 'blur(18px)',
-  position: 'relative',
-  overflow: 'hidden',
+  background:
+    "linear-gradient(165deg, rgba(15,23,42,0.92), rgba(15,23,42,0.78))",
+  border: "1px solid rgba(148,163,184,0.18)",
+  color: "#e2e8f0",
+  boxShadow: "0 24px 48px -32px rgba(15,23,42,0.95)",
+  backdropFilter: "blur(18px)",
+  position: "relative",
+  overflow: "hidden",
 };
 
 const statCardSx = {
   ...surfaceSx,
-  height: '100%',
+  height: "100%",
   minHeight: { xs: 148, md: 168 },
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-between',
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "space-between",
 };
 
 const getIconWrapperSx = (accent) => ({
   width: 48,
   height: 48,
-  borderRadius: '999px',
+  borderRadius: "999px",
   background: `${accent}26`,
   color: accent,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
 });
 
 const statusPalette = {
-  pending: { bg: 'rgba(250,204,21,0.12)', border: 'rgba(250,204,21,0.5)', color: '#facc15' },
-  processing: { bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.5)', color: '#93c5fd' },
-  shipping: { bg: 'rgba(59,130,246,0.12)', border: 'rgba(59,130,246,0.5)', color: '#93c5fd' },
-  paid: { bg: 'rgba(14,165,233,0.12)', border: 'rgba(14,165,233,0.5)', color: '#38bdf8' },
-  completed: { bg: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.5)', color: '#4ade80' },
-  shipped: { bg: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.5)', color: '#4ade80' },
-  cancelled: { bg: 'rgba(248,113,113,0.12)', border: 'rgba(248,113,113,0.5)', color: '#fca5a5' },
-  failed: { bg: 'rgba(248,113,113,0.12)', border: 'rgba(248,113,113,0.5)', color: '#fca5a5' },
-  default: { bg: 'rgba(148,163,184,0.12)', border: 'rgba(148,163,184,0.4)', color: '#cbd5f5' },
+  pending: {
+    bg: "rgba(250,204,21,0.12)",
+    border: "rgba(250,204,21,0.5)",
+    color: "#facc15",
+  },
+  processing: {
+    bg: "rgba(59,130,246,0.12)",
+    border: "rgba(59,130,246,0.5)",
+    color: "#93c5fd",
+  },
+  shipping: {
+    bg: "rgba(59,130,246,0.12)",
+    border: "rgba(59,130,246,0.5)",
+    color: "#93c5fd",
+  },
+  paid: {
+    bg: "rgba(14,165,233,0.12)",
+    border: "rgba(14,165,233,0.5)",
+    color: "#38bdf8",
+  },
+  completed: {
+    bg: "rgba(34,197,94,0.12)",
+    border: "rgba(34,197,94,0.5)",
+    color: "#4ade80",
+  },
+  shipped: {
+    bg: "rgba(34,197,94,0.12)",
+    border: "rgba(34,197,94,0.5)",
+    color: "#4ade80",
+  },
+  cancelled: {
+    bg: "rgba(248,113,113,0.12)",
+    border: "rgba(248,113,113,0.5)",
+    color: "#fca5a5",
+  },
+  failed: {
+    bg: "rgba(248,113,113,0.12)",
+    border: "rgba(248,113,113,0.5)",
+    color: "#fca5a5",
+  },
+  default: {
+    bg: "rgba(148,163,184,0.12)",
+    border: "rgba(148,163,184,0.4)",
+    color: "#cbd5f5",
+  },
 };
 
 const formatCurrency = (value) => `Rs. ${Number(value || 0).toLocaleString()}`;
@@ -85,15 +121,15 @@ const formatCurrency = (value) => `Rs. ${Number(value || 0).toLocaleString()}`;
 function StatCard({ icon, label, value, helper, accent }) {
   const Icon = icon;
   return (
-    <Paper  sx={statCardSx}>
+    <Paper sx={statCardSx}>
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         <Stack spacing={0.5}>
           <Typography
             variant="body2"
             sx={{
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              color: 'rgba(226,232,240,0.7)',
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+              color: "rgba(226,232,240,0.7)",
               fontFamily: fonts.body,
             }}
           >
@@ -103,9 +139,9 @@ function StatCard({ icon, label, value, helper, accent }) {
             variant="h4"
             sx={{
               fontWeight: 700,
-              color: '#f8fafc',
+              color: "#f8fafc",
               fontFamily: fonts.numeric,
-              fontSize: { xs: '1.85rem', md: '2.2rem' },
+              fontSize: { xs: "1.85rem", md: "2.2rem" },
             }}
           >
             {value}
@@ -113,7 +149,7 @@ function StatCard({ icon, label, value, helper, accent }) {
           {helper && (
             <Typography
               variant="body2"
-              sx={{ color: 'rgba(226,232,240,0.72)', fontFamily: fonts.body }}
+              sx={{ color: "rgba(226,232,240,0.72)", fontFamily: fonts.body }}
             >
               {helper}
             </Typography>
@@ -127,14 +163,14 @@ function StatCard({ icon, label, value, helper, accent }) {
   );
 }
 
-function QuickActionCard({ title, description, action, accent = '#f43f5e' }) {
+function QuickActionCard({ title, description, action, accent = "#f43f5e" }) {
   return (
     <Paper
       sx={{
         ...surfaceSx,
         minHeight: { xs: 140, md: 160 },
-        display: 'flex',
-        flexDirection: 'column',
+        display: "flex",
+        flexDirection: "column",
         gap: 1,
       }}
     >
@@ -142,23 +178,31 @@ function QuickActionCard({ title, description, action, accent = '#f43f5e' }) {
         label="Priority"
         size="small"
         sx={{
-          alignSelf: 'flex-start',
-          textTransform: 'uppercase',
-          letterSpacing: '0.08em',
+          alignSelf: "flex-start",
+          textTransform: "uppercase",
+          letterSpacing: "0.08em",
           fontFamily: fonts.body,
           backgroundColor: `${accent}22`,
           color: accent,
           borderColor: `${accent}55`,
-          border: '1px solid',
+          border: "1px solid",
         }}
       />
       <Typography
         variant="h6"
-        sx={{ color: '#f8fafc', fontWeight: 700, fontFamily: fonts.heading, lineHeight: 1.35 }}
+        sx={{
+          color: "#f8fafc",
+          fontWeight: 700,
+          fontFamily: fonts.heading,
+          lineHeight: 1.35,
+        }}
       >
         {title}
       </Typography>
-      <Typography variant="body2" sx={{ color: 'rgba(226,232,240,0.72)', fontFamily: fonts.body }}>
+      <Typography
+        variant="body2"
+        sx={{ color: "rgba(226,232,240,0.72)", fontFamily: fonts.body }}
+      >
         {description}
       </Typography>
       {action}
@@ -176,7 +220,7 @@ function RecentOrdersList({ orders, loading }) {
             variant="rounded"
             height={72}
             animation="wave"
-            sx={{ backgroundColor: 'rgba(148,163,184,0.16)' }}
+            sx={{ backgroundColor: "rgba(148,163,184,0.16)" }}
           />
         ))}
       </Stack>
@@ -185,7 +229,10 @@ function RecentOrdersList({ orders, loading }) {
 
   if (!orders.length) {
     return (
-      <Typography variant="body2" sx={{ mt: 2, color: 'rgba(226,232,240,0.7)' }}>
+      <Typography
+        variant="body2"
+        sx={{ mt: 2, color: "rgba(226,232,240,0.7)" }}
+      >
         No recent orders. New purchases will appear here.
       </Typography>
     );
@@ -201,29 +248,37 @@ function RecentOrdersList({ orders, loading }) {
             sx={{
               p: 2,
               borderRadius: 2,
-              border: '1px solid rgba(148,163,184,0.18)',
-              background: 'rgba(15,23,42,0.55)',
-              display: 'flex',
-              flexDirection: { xs: 'column', sm: 'row' },
-              justifyContent: 'space-between',
+              border: "1px solid rgba(148,163,184,0.18)",
+              background: "rgba(15,23,42,0.55)",
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              justifyContent: "space-between",
               gap: 1.5,
             }}
           >
             <Stack spacing={0.5}>
               <Typography
                 variant="subtitle2"
-                sx={{ fontWeight: 600, color: '#f8fafc', fontFamily: fonts.heading }}
+                sx={{
+                  fontWeight: 600,
+                  color: "#f8fafc",
+                  fontFamily: fonts.heading,
+                }}
               >
                 #{order._id?.slice(-6) || order._id}
               </Typography>
               <Typography
                 variant="body2"
-                sx={{ color: 'rgba(226,232,240,0.7)', fontFamily: fonts.body }}
+                sx={{ color: "rgba(226,232,240,0.7)", fontFamily: fonts.body }}
               >
-                {order.user?.name || 'Unknown customer'} · {order.items?.length || 0} items
+                {order.user?.name || "Unknown customer"} ·{" "}
+                {order.items?.length || 0} items
               </Typography>
-              <Typography variant="caption" sx={{ color: 'rgba(226,232,240,0.6)', fontFamily: fonts.body }}>
-                {dayjs(order.createdAt).format('MMM D, YYYY • h:mm A')}
+              <Typography
+                variant="caption"
+                sx={{ color: "rgba(226,232,240,0.6)", fontFamily: fonts.body }}
+              >
+                {dayjs(order.createdAt).format("MMM D, YYYY • h:mm A")}
               </Typography>
             </Stack>
             <Stack spacing={1} alignItems="flex-end">
@@ -231,7 +286,7 @@ function RecentOrdersList({ orders, loading }) {
                 label={order.status}
                 size="small"
                 sx={{
-                  textTransform: 'capitalize',
+                  textTransform: "capitalize",
                   fontWeight: 600,
                   color: style.color,
                   borderColor: style.border,
@@ -240,7 +295,14 @@ function RecentOrdersList({ orders, loading }) {
                 }}
                 variant="outlined"
               />
-              <Typography variant="body1" sx={{ color: '#f8fafc', fontWeight: 600, fontFamily: fonts.numeric }}>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: "#f8fafc",
+                  fontWeight: 600,
+                  fontFamily: fonts.numeric,
+                }}
+              >
                 {formatCurrency(order.total)}
               </Typography>
             </Stack>
@@ -261,7 +323,10 @@ function InventoryHighlights({ books, loading }) {
               variant="rounded"
               height={88}
               animation="wave"
-              sx={{ backgroundColor: 'rgba(148,163,184,0.16)', borderRadius: 2 }}
+              sx={{
+                backgroundColor: "rgba(148,163,184,0.16)",
+                borderRadius: 2,
+              }}
             />
           </Grid>
         ))}
@@ -271,7 +336,10 @@ function InventoryHighlights({ books, loading }) {
 
   if (!books.length) {
     return (
-      <Typography variant="body2" sx={{ mt: 2, color: 'rgba(226,232,240,0.7)' }}>
+      <Typography
+        variant="body2"
+        sx={{ mt: 2, color: "rgba(226,232,240,0.7)" }}
+      >
         Inventory looks healthy. Low-stock titles will surface here.
       </Typography>
     );
@@ -285,10 +353,10 @@ function InventoryHighlights({ books, loading }) {
             sx={{
               ...surfaceSx,
               p: { xs: 1.75, md: 2 },
-              display: 'flex',
-              flexDirection: 'row',
+              display: "flex",
+              flexDirection: "row",
               gap: 1.5,
-              alignItems: 'flex-start',
+              alignItems: "flex-start",
             }}
           >
             <Box
@@ -296,33 +364,46 @@ function InventoryHighlights({ books, loading }) {
                 width: 72,
                 height: 96,
                 borderRadius: 2,
-                overflow: 'hidden',
+                overflow: "hidden",
                 flexShrink: 0,
-                boxShadow: '0 16px 30px -24px rgba(15,23,42,0.85)',
-                border: '1px solid rgba(148,163,184,0.22)',
+                boxShadow: "0 16px 30px -24px rgba(15,23,42,0.85)",
+                border: "1px solid rgba(148,163,184,0.22)",
               }}
             >
               <img
-                src={book.coverUrl || '/placeholder.svg'}
+                src={book.coverUrl || "/placeholder.svg"}
                 alt={book.title}
                 loading="lazy"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
+                }}
               />
             </Box>
             <Stack spacing={0.75} sx={{ flex: 1 }}>
               <Typography
                 variant="subtitle1"
-                sx={{ fontWeight: 600, color: '#f8fafc', fontFamily: fonts.heading }}
+                sx={{
+                  fontWeight: 600,
+                  color: "#f8fafc",
+                  fontFamily: fonts.heading,
+                }}
               >
                 {book.title}
               </Typography>
               <Typography
                 variant="body2"
-                sx={{ color: 'rgba(226,232,240,0.72)', fontFamily: fonts.body }}
+                sx={{ color: "rgba(226,232,240,0.72)", fontFamily: fonts.body }}
               >
-                Stock on hand: {book.stock ?? '—'} · Category: {book.category || 'General'}
+                Stock on hand: {book.stock ?? "—"} · Category:{" "}
+                {book.category || "General"}
               </Typography>
-              <Typography variant="body2" sx={{ color: '#f8fafc', fontFamily: fonts.numeric }}>
+              <Typography
+                variant="body2"
+                sx={{ color: "#f8fafc", fontFamily: fonts.numeric }}
+              >
                 {formatCurrency(book.price_npr)}
               </Typography>
             </Stack>
@@ -335,12 +416,12 @@ function InventoryHighlights({ books, loading }) {
 
 export default function AdminDashboard() {
   const ordersQuery = useQuery({
-    queryKey: ['dashboard', 'adminOrders'],
+    queryKey: ["dashboard", "adminOrders"],
     queryFn: () => getAllOrders(),
   });
 
   const booksQuery = useQuery({
-    queryKey: ['dashboard', 'adminBooks'],
+    queryKey: ["dashboard", "adminBooks"],
     queryFn: () => fetchBooks({ limit: 12 }),
   });
 
@@ -350,11 +431,16 @@ export default function AdminDashboard() {
     [orders]
   );
   const inProgressOrders = useMemo(
-    () => orders.filter((order) => ['pending', 'processing', 'shipping', 'paid'].includes(order.status)).length,
+    () =>
+      orders.filter((order) =>
+        ["pending", "processing", "shipping", "paid"].includes(order.status)
+      ).length,
     [orders]
   );
   const completedOrders = useMemo(
-    () => orders.filter((order) => ['completed', 'shipped'].includes(order.status)).length,
+    () =>
+      orders.filter((order) => ["completed", "shipped"].includes(order.status))
+        .length,
     [orders]
   );
   const uniqueCustomers = useMemo(() => {
@@ -362,7 +448,7 @@ export default function AdminDashboard() {
       orders
         .map((order) => {
           if (!order.user) return undefined;
-          if (typeof order.user === 'string') return order.user;
+          if (typeof order.user === "string") return order.user;
           return order.user?._id;
         })
         .filter(Boolean)
@@ -381,7 +467,9 @@ export default function AdminDashboard() {
 
   const lowStockBooks = useMemo(() => {
     const items = booksQuery.data?.items || [];
-    const lowStock = items.filter((book) => typeof book.stock === 'number' && book.stock <= 8);
+    const lowStock = items.filter(
+      (book) => typeof book.stock === "number" && book.stock <= 8
+    );
     return (lowStock.length ? lowStock : items).slice(0, 4);
   }, [booksQuery.data]);
 
@@ -397,77 +485,93 @@ export default function AdminDashboard() {
   const statCards = [
     {
       icon: TrendingUp,
-      label: 'Total revenue',
+      label: "Total revenue",
       value: formatCurrency(totalRevenue),
       helper: `${orders.length} orders processed`,
-      accent: '#f43f5e',
+      accent: "#f43f5e",
     },
     {
       icon: Package,
-      label: 'Active fulfilment',
+      label: "Active fulfilment",
       value: inProgressOrders,
-      helper: 'Awaiting processing or shipment',
-      accent: '#38bdf8',
+      helper: "Awaiting processing or shipment",
+      accent: "#38bdf8",
     },
     {
       icon: Users,
-      label: 'Customers',
+      label: "Customers",
       value: uniqueCustomers,
-      helper: 'Unique shoppers served',
-      accent: '#a855f7',
+      helper: "Unique shoppers served",
+      accent: "#a855f7",
     },
     {
       icon: CreditCard,
-      label: 'Avg. order value',
+      label: "Avg. order value",
       value: formatCurrency(avgOrderValue),
-      helper: completedOrders ? `${completedOrders} completed` : 'Complete first order',
-      accent: '#facc15',
+      helper: completedOrders
+        ? `${completedOrders} completed`
+        : "Complete first order",
+      accent: "#facc15",
     },
   ];
 
   return (
-    
     <Container
       component={motion.div}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: 'easeOut' }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
       sx={{ py: { xs: 4, md: 6 }, px: { xs: 1.5, sm: 2 } }}
       maxWidth="xl"
     >
-
       <Background />
       <div className="relative z-10">
-       
         <Stack spacing={4}>
-          <Paper sx={{ ...surfaceSx, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+          <Paper
+            sx={{
+              ...surfaceSx,
+              display: "flex",
+              flexDirection: "column",
+              gap: 1.5,
+            }}
+          >
             <Typography
               variant="h4"
-              sx={{ color: '#f8fafc', fontWeight: 700, fontFamily: fonts.heading, fontSize: { xs: '2rem', md: '2.35rem' } }}
+              sx={{
+                color: "#f8fafc",
+                fontWeight: 700,
+                fontFamily: fonts.heading,
+                fontSize: { xs: "2rem", md: "2.35rem" },
+              }}
             >
               Store overview
             </Typography>
             <Typography
               variant="body1"
-              sx={{ color: 'rgba(226,232,240,0.75)', fontFamily: fonts.body, maxWidth: 640 }}
+              sx={{
+                color: "rgba(226,232,240,0.75)",
+                fontFamily: fonts.body,
+                maxWidth: 640,
+              }}
             >
-              Track operations at a glance. Dive deeper into orders, inventory, and customer health in real time.
+              Track operations at a glance. Dive deeper into orders, inventory,
+              and customer health in real time.
             </Typography>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
               <Button
                 component="a"
                 href="/admin/orders"
                 variant="contained"
                 sx={{
-                  backgroundColor: '#f43f5e',
-                  color: '#0f172a',
+                  backgroundColor: "#f43f5e",
+                  color: "#0f172a",
                   fontWeight: 700,
-                  textTransform: 'none',
+                  textTransform: "none",
                   px: 3,
                   py: 1.5,
                   borderRadius: 2,
                   fontFamily: fonts.heading,
-                  '&:hover': { backgroundColor: '#fb7185' },
+                  "&:hover": { backgroundColor: "#fb7185" },
                 }}
                 startIcon={<ArrowUpRight size={18} />}
               >
@@ -478,13 +582,16 @@ export default function AdminDashboard() {
                 href="/admin/books"
                 variant="outlined"
                 sx={{
-                  textTransform: 'none',
+                  textTransform: "none",
                   fontWeight: 600,
                   fontFamily: fonts.body,
                   borderRadius: 2,
-                  color: '#f8fafc',
-                  borderColor: 'rgba(248,113,113,0.55)',
-                  '&:hover': { borderColor: '#f43f5e', backgroundColor: 'rgba(248,113,113,0.08)' },
+                  color: "#f8fafc",
+                  borderColor: "rgba(248,113,113,0.55)",
+                  "&:hover": {
+                    borderColor: "#f43f5e",
+                    backgroundColor: "rgba(248,113,113,0.08)",
+                  },
                 }}
               >
                 Manage titles
@@ -494,12 +601,12 @@ export default function AdminDashboard() {
 
           <Box
             sx={{
-              display: 'grid',
+              display: "grid",
               gap: { xs: 2, md: 2.5 },
               gridTemplateColumns: {
-                xs: 'repeat(1, minmax(0, 1fr))',
-                sm: 'repeat(2, minmax(0, 1fr))',
-                lg: 'repeat(4, minmax(0, 1fr))',
+                xs: "repeat(1, minmax(0, 1fr))",
+                sm: "repeat(2, minmax(0, 1fr))",
+                lg: "repeat(4, minmax(0, 1fr))",
               },
             }}
           >
@@ -510,11 +617,11 @@ export default function AdminDashboard() {
 
           <Box
             sx={{
-              display: 'grid',
+              display: "grid",
               gap: { xs: 2, md: 2.5 },
               gridTemplateColumns: {
-                xs: 'repeat(1, minmax(0, 1fr))',
-                md: 'repeat(2, minmax(0, 1fr))',
+                xs: "repeat(1, minmax(0, 1fr))",
+                md: "repeat(2, minmax(0, 1fr))",
               },
             }}
           >
@@ -523,36 +630,50 @@ export default function AdminDashboard() {
                 <LineChart size={18} color="#38bdf8" />
                 <Typography
                   variant="h6"
-                  sx={{ fontWeight: 700, color: '#f8fafc', fontFamily: fonts.heading }}
+                  sx={{
+                    fontWeight: 700,
+                    color: "#f8fafc",
+                    fontFamily: fonts.heading,
+                  }}
                 >
                   Top ticket orders
                 </Typography>
               </Stack>
               <Typography
                 variant="body2"
-                sx={{ color: 'rgba(226,232,240,0.7)', fontFamily: fonts.body }}
+                sx={{ color: "rgba(226,232,240,0.7)", fontFamily: fonts.body }}
               >
                 Highest value purchases over the last period.
               </Typography>
-              <RecentOrdersList orders={topTicketOrders} loading={ordersQuery.isLoading} />
+              <RecentOrdersList
+                orders={topTicketOrders}
+                loading={ordersQuery.isLoading}
+              />
             </Paper>
             <Paper sx={surfaceSx}>
               <Stack direction="row" alignItems="center" spacing={1}>
                 <AlertCircle size={18} color="#facc15" />
                 <Typography
                   variant="h6"
-                  sx={{ fontWeight: 700, color: '#f8fafc', fontFamily: fonts.heading }}
+                  sx={{
+                    fontWeight: 700,
+                    color: "#f8fafc",
+                    fontFamily: fonts.heading,
+                  }}
                 >
                   Inventory spotlight
                 </Typography>
               </Stack>
               <Typography
                 variant="body2"
-                sx={{ color: 'rgba(226,232,240,0.7)', fontFamily: fonts.body }}
+                sx={{ color: "rgba(226,232,240,0.7)", fontFamily: fonts.body }}
               >
                 Watch titles trending toward low stock and adjust replenishment.
               </Typography>
-              <InventoryHighlights books={lowStockBooks} loading={booksQuery.isLoading} />
+              <InventoryHighlights
+                books={lowStockBooks}
+                loading={booksQuery.isLoading}
+              />
             </Paper>
           </Box>
 
@@ -561,28 +682,35 @@ export default function AdminDashboard() {
               <ShoppingBag size={18} color="#4ade80" />
               <Typography
                 variant="h6"
-                sx={{ fontWeight: 700, color: '#f8fafc', fontFamily: fonts.heading }}
+                sx={{
+                  fontWeight: 700,
+                  color: "#f8fafc",
+                  fontFamily: fonts.heading,
+                }}
               >
                 Fresh activity
               </Typography>
             </Stack>
             <Typography
               variant="body2"
-              sx={{ color: 'rgba(226,232,240,0.7)', fontFamily: fonts.body }}
+              sx={{ color: "rgba(226,232,240,0.7)", fontFamily: fonts.body }}
             >
               A quick pulse of recent orders to keep you informed.
             </Typography>
-            <RecentOrdersList orders={recentOrders} loading={ordersQuery.isLoading} />
+            <RecentOrdersList
+              orders={recentOrders}
+              loading={ordersQuery.isLoading}
+            />
           </Paper>
 
           <Box
             sx={{
-              display: 'grid',
+              display: "grid",
               gap: { xs: 2, md: 2.5 },
               gridTemplateColumns: {
-                xs: 'repeat(1, minmax(0, 1fr))',
-                sm: 'repeat(2, minmax(0, 1fr))',
-                md: 'repeat(3, minmax(0, 1fr))',
+                xs: "repeat(1, minmax(0, 1fr))",
+                sm: "repeat(2, minmax(0, 1fr))",
+                md: "repeat(3, minmax(0, 1fr))",
               },
             }}
           >
@@ -596,11 +724,11 @@ export default function AdminDashboard() {
                   href="/admin/orders"
                   variant="text"
                   sx={{
-                    alignSelf: 'flex-start',
-                    textTransform: 'none',
+                    alignSelf: "flex-start",
+                    textTransform: "none",
                     fontWeight: 600,
                     fontFamily: fonts.body,
-                    color: '#f8fafc',
+                    color: "#f8fafc",
                     px: 0,
                   }}
                 >
@@ -618,11 +746,11 @@ export default function AdminDashboard() {
                   href="/admin/books"
                   variant="text"
                   sx={{
-                    alignSelf: 'flex-start',
-                    textTransform: 'none',
+                    alignSelf: "flex-start",
+                    textTransform: "none",
                     fontWeight: 600,
                     fontFamily: fonts.body,
-                    color: '#f8fafc',
+                    color: "#f8fafc",
                     px: 0,
                   }}
                 >
@@ -640,11 +768,11 @@ export default function AdminDashboard() {
                   href="/admin/books/new"
                   variant="text"
                   sx={{
-                    alignSelf: 'flex-start',
-                    textTransform: 'none',
+                    alignSelf: "flex-start",
+                    textTransform: "none",
                     fontWeight: 600,
                     fontFamily: fonts.body,
-                    color: '#f8fafc',
+                    color: "#f8fafc",
                     px: 0,
                   }}
                 >
